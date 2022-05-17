@@ -1,7 +1,4 @@
 # Grafana
-    
-    []: # Language: markdown
-    []: # Path: openshift-logs/grafana_access.md
 
 With Grafana access, you will be able to:   
 - Access the Grafana UI to visualize Operate First cluster metrics and logs   
