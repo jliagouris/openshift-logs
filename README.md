@@ -10,7 +10,7 @@ Steps for onboarding a project to OpenShift can be found [here](onboarding_proje
 
 ### Grafana Dashboard Access
 
-Steps for accessing the Grafana Dashboard can be found [here](grafana_dashboard.md).
+Steps for accessing the Grafana Dashboard can be found [here](grafana_access.md).
 
 ### Loki API Access
 
