@@ -8,9 +8,10 @@ import (
 
 // KafkaProducer Producer that sends queried and preprocessed logs to Kafka broker
 type KafkaProducer struct {
-	producer *kafka.Producer      // producer in confluent_kafka_go
-	msgChan  chan ProducerMessage // Get asynchronously generated messages through this channel
-	timeout  int                  // Producer timeout
+	producer *kafka.Producer // producer in confluent_kafka_go
+	//TODO: Buffered channels for better performance? Maybe?
+	MsgChan chan ProducerMessage // Get asynchronously generated messages through this channel
+	timeout int                  // Producer timeout
 }
 
 // ProducerMessage Message sent to the producer. Wraps real data msg to be sent
@@ -39,7 +40,7 @@ func (p *KafkaProducer) ProduceLoop() {
 	}()
 
 	// Produce all msgs sent to the channel until receive a close msg
-	for producerMsg := range p.msgChan {
+	for producerMsg := range p.MsgChan {
 		if producerMsg.kill {
 			break
 		}
@@ -90,7 +91,7 @@ func MakeKafkaProducer(configMap *kafka.ConfigMap, msgChan chan ProducerMessage,
 	}
 
 	kp := KafkaProducer{producer: p,
-		msgChan: msgChan,
+		MsgChan: msgChan,
 		timeout: timeout,
 	}
 
