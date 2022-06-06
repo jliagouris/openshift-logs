@@ -67,6 +67,7 @@ func (p *KafkaProducer) Events() chan kafka.Event {
 
 // Flush Wrapper of confluent_kafka Flush() method
 func (p *KafkaProducer) Flush() {
+	//TODO: What do we do if some messages fail?
 	unsuccessfulMsgCnt := p.producer.Flush(p.timeout)
 	if unsuccessfulMsgCnt > 0 {
 		fmt.Printf("%v messages failed to deliever\n", unsuccessfulMsgCnt)
