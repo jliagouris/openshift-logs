@@ -6,12 +6,13 @@ import (
 	"os"
 )
 
-//Producer that sends queried and preprocessed logs to Kafka broker
-type Kafka_producer struct {
+// KafkaProducer Producer that sends queried and preprocessed logs to Kafka broker
+type KafkaProducer struct {
 	producer *kafka.Producer
 }
 
-func make_kafka_producer(configMap *kafka.ConfigMap) *Kafka_producer {
+// MakeKafkaProducer Creates producer object
+func MakeKafkaProducer(configMap *kafka.ConfigMap) *KafkaProducer {
 	p, err := kafka.NewProducer(configMap)
 
 	if err != nil {
@@ -19,7 +20,7 @@ func make_kafka_producer(configMap *kafka.ConfigMap) *Kafka_producer {
 		os.Exit(1)
 	}
 
-	kp := Kafka_producer{producer: p}
+	kp := KafkaProducer{producer: p}
 
 	return &kp
 }
