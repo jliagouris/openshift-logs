@@ -8,12 +8,14 @@ import (
 	"sync"
 )
 
+// PRODUCER_TMO is the timeout for producers
 var PRODUCER_TMO int
 
+// operator struct
 type operator struct {
 	parser        *components.LogParser
 	preprocessor  *components.Preprocessor
-	dataShareChan chan components.DataShare
+	dataShareChan <-chan components.DataShare //channel shared by operator and preprocessor
 	producers     []*components.KafkaProducer
 }
 
@@ -32,13 +34,14 @@ func makePushOperator(confList []kafka.ConfigMap, producerTimeout int) *operator
 		msgChan := make(chan components.ProducerMessage)
 		pushOperator.producers[idx] = components.MakeKafkaProducer(&conf, msgChan, producerTimeout)
 	}
-
 	pushOperator.parser = components.MakeParser() // TODO: This will change
-	pushOperator.preprocessor = components.MakePreprocessor(len(confList), pushOperator.parser.LogChan)
-	pushOperator.dataShareChan = pushOperator.preprocessor.DataShareChan
+	DataShareChan := make(chan components.DataShare)
+	pushOperator.preprocessor = components.MakePreprocessor(len(confList), pushOperator.parser.LogChan, DataShareChan)
+	pushOperator.dataShareChan = DataShareChan
 	return &pushOperator
 }
 
+// Main thread of the operator
 func (o *operator) run() {
 	// Start parser goroutine
 	go o.parser.ParseLoop()
@@ -58,6 +61,7 @@ func (o *operator) run() {
 	wg.Wait()
 }
 
+// Dispatch data shares to their designated producers
 func (o *operator) dispatchDataShareLoop() {
 	for dataShare := range o.dataShareChan {
 		kafkaMsg := o.dataShare2ProducerMsg(dataShare)
@@ -73,6 +77,7 @@ func (o *operator) dispatchDataShareLoop() {
 	}
 }
 
+// Turn a data share to Kafka messages
 func (o *operator) dataShare2ProducerMsg(dataShare components.DataShare) components.ProducerMessage {
 	//TODO: Fill this
 	return components.ProducerMessage{}

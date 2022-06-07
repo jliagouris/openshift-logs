@@ -3,9 +3,9 @@ package components
 // Preprocesses logs queried by parser
 
 type Preprocessor struct {
-	LogChan       chan Log       // Channel shared with logParser, gets queried logs
-	DataShareChan chan DataShare // Channel shared with operator
-	numProducers  int            // Number of producers, used in producer decision
+	LogChan       <-chan Log       // Channel shared with logParser, gets queried logs
+	DataShareChan chan<- DataShare // Channel shared with operator
+	numProducers  int              // Number of producers, used in producer decision
 }
 
 // DataShare is the preprocessed share of data to be sent to secrecy servers
@@ -16,10 +16,10 @@ type DataShare struct {
 }
 
 // MakePreprocessor Creates preprocessor object
-func MakePreprocessor(numProducers int, LogChan chan Log) *Preprocessor {
+func MakePreprocessor(numProducers int, LogChan <-chan Log, DataShareChan chan<- DataShare) *Preprocessor {
 	preprocessor := Preprocessor{
 		LogChan:       LogChan,
-		DataShareChan: make(chan DataShare),
+		DataShareChan: DataShareChan,
 		numProducers:  numProducers,
 	}
 	return &preprocessor
