@@ -11,3 +11,4 @@ To install confluent kafka package, either run get_confluent_kafka_go.sh or run 
 - Assumptions made:
 1. All kafka producers have the same timeouts (Can be made different in future)
 2. All producers push to the same single topic (Maybe different multiple topics?)
+3. Order of messages doesn't matter
