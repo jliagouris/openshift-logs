@@ -17,14 +17,14 @@ type KafkaProducer struct {
 // ProducerMessage Message sent to the producer. Wraps real data msg to be sent
 type ProducerMessage struct {
 	msg   kafka.Message // msg contains log and any other information needed by Kafka
-	kill  bool          // kill indicates if all logs has been produces, and we can exit the loop
+	EOF   bool          // EOF indicates if all logs has been produces, and we can exit the loop
 	topic string        // topic the message to be sent to
 }
 
 // ProduceLoop Goroutine that loops to push messages to Secrecy kafka broker
 func (p *KafkaProducer) ProduceLoop() {
 
-	// Goroutine that handles producer event messages
+	// Goroutine that handles producer event messages asynchronously
 	go func() {
 		for e := range p.Events() {
 			switch ev := e.(type) {
@@ -41,7 +41,7 @@ func (p *KafkaProducer) ProduceLoop() {
 
 	// Produce all msgs sent to the channel until receive a close msg
 	for producerMsg := range p.MsgChan {
-		if producerMsg.kill {
+		if producerMsg.EOF {
 			break
 		}
 		p.produce(producerMsg.topic, &producerMsg.msg)
@@ -66,7 +66,7 @@ func (p *KafkaProducer) Events() chan kafka.Event {
 	return p.producer.Events()
 }
 
-// Flush Wrapper of confluent_kafka Flush() method
+// Flush Wrapper of confluent_kafka Flush() method, waits until all messages are acked or timeout
 func (p *KafkaProducer) Flush() {
 	//TODO: What do we do if some messages fail?
 	unsuccessfulMsgCnt := p.producer.Flush(p.timeout)
@@ -77,6 +77,7 @@ func (p *KafkaProducer) Flush() {
 	}
 }
 
+// Close Wrapper of confluent_kafka Close() method
 func (p *KafkaProducer) Close() {
 	p.producer.Close()
 }

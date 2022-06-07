@@ -4,11 +4,12 @@ package components
 
 // LogParser queries Loki logs, structure the log, and puts it into a channel shared with preprocessor
 type LogParser struct {
-	LogChan chan Log //Channel to communicate with preprocessor goroutine
+	LogChan chan Log // Channel to communicate with preprocessor goroutine
 }
 
-//Parsed log
+// Log Parsed log
 type Log struct {
+	EOF bool
 	//TODO: Fill this
 }
 
@@ -18,7 +19,7 @@ func MakeParser() *LogParser {
 	return &parser
 }
 
-//Iteratively parse logs using Grafana Loki
-func (parser *LogParser) parseLoop() {
+// ParseLoop Iteratively parse logs using Grafana Loki
+func (parser *LogParser) ParseLoop() {
 	//TODO: Fill this
 }
