@@ -12,6 +12,8 @@ type LogParser struct {
 type Log struct {
 	EOF bool
 	//TODO: Fill this
+	val   int
+	topic string
 }
 
 // MakeParser creates LogParser object, this definitely will change
@@ -24,4 +26,12 @@ func MakeParser() *LogParser {
 // ParseLoop Iteratively parse logs using Grafana Loki
 func (parser *LogParser) ParseLoop() {
 	//TODO: Fill this
+	for i := 0; i < 10; i++ {
+		parser.LogChan <- Log{
+			EOF:   false,
+			val:   i,
+			topic: "naive_test",
+		}
+	}
+	parser.LogChan <- Log{EOF: true}
 }
