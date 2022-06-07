@@ -10,8 +10,9 @@ type Preprocessor struct {
 
 // DataShare is the preprocessed share of data to be sent to secrecy servers
 type DataShare struct {
-	ProducerId int             // Which producer does this data share go to?
-	Message    ProducerMessage // Message to the producer
+	ProducerIdArr []int           // Which producers does this data share go to?
+	Message       ProducerMessage // Message to the producer
+	EOF           bool            // If all logs are already processed and the task can end
 }
 
 // MakePreprocessor Creates preprocessor object
@@ -27,13 +28,9 @@ func MakePreprocessor(numProducers int, LogChan chan Log) *Preprocessor {
 // PreprocessLoop Goroutine that iteratively processes logs passed by parser
 func (p *Preprocessor) PreprocessLoop() {
 	for log := range p.LogChan {
-		if log.EOF {
-			break
-		}
 		dataShares := p.generateDataShares(log)
 
 		// Send data shares to the channel
-		//TODO: How to make this asynchronous？
 		//go func() {
 		for _, dataShare := range dataShares {
 			p.DataShareChan <- *dataShare
