@@ -21,7 +21,7 @@ type operator struct {
 
 // Main function of the operator
 func main() {
-	PRODUCER_TMO = 15 * 1000
+	PRODUCER_TMO = 15 * 1000 // This is an arbitrarily chosen timeout
 	confList := getKafkaConfigMap()
 	pushOperator := makePushOperator(confList, PRODUCER_TMO)
 	pushOperator.run()

@@ -28,19 +28,17 @@ func MakePreprocessor(numProducers int, LogChan <-chan Log, DataShareChan chan<-
 // PreprocessLoop Goroutine that iteratively processes logs passed by parser
 func (p *Preprocessor) PreprocessLoop() {
 	for log := range p.LogChan {
-		dataShares := p.generateDataShares(log)
+		dataShares := p.log2DataShares(log)
 
 		// Send data shares to the channel
-		//go func() {
 		for _, dataShare := range dataShares {
 			p.DataShareChan <- *dataShare
 		}
-		//}()
 	}
 }
 
 // Generate Data shares from log
-func (p *Preprocessor) generateDataShares(log Log) []*DataShare {
+func (p *Preprocessor) log2DataShares(log Log) []*DataShare {
 	//TODO: Fill this
 	return nil
 }
