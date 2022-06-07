@@ -31,7 +31,7 @@ func main() {
 func makePushOperator(confList []kafka.ConfigMap, producerTimeout int) *operator {
 	pushOperator := operator{producers: make([]*components.KafkaProducer, len(confList))}
 	for idx, conf := range confList {
-		msgChan := make(chan components.ProducerMessage)
+		msgChan := make(chan components.DataShare)
 		pushOperator.producers[idx] = components.MakeKafkaProducer(&conf, msgChan, producerTimeout)
 	}
 	pushOperator.parser = components.MakeParser() // TODO: This will change
@@ -64,24 +64,30 @@ func (o *operator) run() {
 // Dispatch data shares to their designated producers
 func (o *operator) dispatchDataShareLoop() {
 	for dataShare := range o.dataShareChan {
-		kafkaMsg := o.dataShare2ProducerMsg(dataShare)
 		if dataShare.EOF {
 			for _, producer := range o.producers {
-				producer.MsgChan <- kafkaMsg
+				producer.MsgChan <- dataShare
 			}
 		} else {
 			for _, producerId := range dataShare.ProducerIdArr {
-				o.producers[producerId].MsgChan <- kafkaMsg
+				o.producers[producerId].MsgChan <- dataShare
 			}
 		}
 	}
 }
 
+/*
 // Turn a data share to Kafka messages
 func (o *operator) dataShare2ProducerMsg(dataShare components.DataShare) components.ProducerMessage {
 	//TODO: Fill this
-	return components.ProducerMessage{}
+	msg := components.ProducerMessage{
+		Msg:   dataShare.Message,
+		EOF:   false,
+		Topic: "",
+	}
+	return
 }
+*/
 
 // Gets the configurations that allow the operator talk to the correct Kafka brokers
 func getKafkaConfigMap() []kafka.ConfigMap {
