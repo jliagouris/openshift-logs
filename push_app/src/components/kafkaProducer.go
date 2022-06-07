@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"os"
+	"sync"
 )
 
 // KafkaProducer Producer that sends queried and preprocessed logs to Kafka broker
@@ -22,11 +23,11 @@ type ProducerMessage struct {
 }
 
 // ProduceLoop Goroutine that loops to push messages to Secrecy kafka broker
-func (p *KafkaProducer) ProduceLoop() {
+func (p *KafkaProducer) ProduceLoop(wg *sync.WaitGroup) {
 
 	// Goroutine that handles producer event messages asynchronously
 	go func() {
-		for e := range p.Events() {
+		for e := range p.events() {
 			switch ev := e.(type) {
 			case *kafka.Message:
 				if ev.TopicPartition.Error != nil {
@@ -41,15 +42,13 @@ func (p *KafkaProducer) ProduceLoop() {
 
 	// Produce all msgs sent to the channel until receive a close msg
 	for producerMsg := range p.MsgChan {
-		if producerMsg.EOF {
-			break
-		}
 		p.produce(producerMsg.topic, &producerMsg.msg)
 	}
 
 	// Wait for all messages to be delivered
-	p.Flush()
+	p.flush()
 	p.Close()
+	wg.Done()
 }
 
 // Wrapper of confluent_kafka produce method
@@ -61,13 +60,13 @@ func (p *KafkaProducer) produce(topic string, msg *kafka.Message) {
 	}
 }
 
-// Events Wrapper of confluent_kafka Events method
-func (p *KafkaProducer) Events() chan kafka.Event {
+// events Wrapper of confluent_kafka events method
+func (p *KafkaProducer) events() chan kafka.Event {
 	return p.producer.Events()
 }
 
-// Flush Wrapper of confluent_kafka Flush() method, waits until all messages are acked or timeout
-func (p *KafkaProducer) Flush() {
+// flush Wrapper of confluent_kafka flush() method, waits until all messages are acked or timeout
+func (p *KafkaProducer) flush() {
 	//TODO: What do we do if some messages fail?
 	unsuccessfulMsgCnt := p.producer.Flush(p.timeout)
 	if unsuccessfulMsgCnt > 0 {
