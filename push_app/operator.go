@@ -4,7 +4,10 @@ package main
 
 import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"push_app/src/components"
+	"gopkg.in/yaml.v3"
+	"io/ioutil"
+	"log"
+	"push_app/components"
 	"sync"
 )
 
@@ -29,8 +32,10 @@ func main() {
 
 // Create operator object
 func makePushOperator(confList []kafka.ConfigMap, producerTimeout int) *operator {
+	//fmt.Println("Called makePushOperator")
 	pushOperator := operator{producers: make([]*components.KafkaProducer, len(confList))}
 	for idx, conf := range confList {
+		//fmt.Printf("Making producer #%v\n", idx)
 		msgChan := make(chan components.DataShare)
 		pushOperator.producers[idx] = components.MakeKafkaProducer(&conf, msgChan, producerTimeout)
 	}
@@ -63,7 +68,11 @@ func (o *operator) run() {
 
 // Dispatch data shares to their designated producers
 func (o *operator) dispatchDataShareLoop() {
+	//dataShareCnt := 0
 	for dataShare := range o.dataShareChan {
+		//dataShareCnt++
+		//fmt.Printf("Datashare cnt: %v\n", dataShareCnt)
+		//fmt.Printf("datashare content: %v\n", dataShare)
 		if dataShare.EOF {
 			for _, producer := range o.producers {
 				producer.MsgChan <- dataShare
@@ -89,8 +98,29 @@ func (o *operator) dataShare2ProducerMsg(dataShare components.DataShare) compone
 }
 */
 
+type Clusters struct {
+	Confs map[string]kafka.ConfigMap `yaml:"Clusters"`
+}
+
 // Gets the configurations that allow the operator talk to the correct Kafka brokers
 func getKafkaConfigMap() []kafka.ConfigMap {
-	//TODO: Fill this, need to know how to get info
-	return nil
+	clustersConf := Clusters{}
+	yamlFile, err := ioutil.ReadFile("config.yaml")
+	if err != nil {
+		log.Printf("yamlFile.Get err   #%v ", err)
+	}
+	err = yaml.Unmarshal(yamlFile, &clustersConf)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
+	}
+	configSlice := make([]kafka.ConfigMap, len(clustersConf.Confs))
+	idx := 0
+	for _, conf := range clustersConf.Confs {
+		//fmt.Printf(" server: %v\n", conf)
+		configSlice[idx] = conf
+		idx++
+	}
+	//fmt.Printf("Generated %v configs\n", configSlice)
+	//fmt.Printf("Generated %v configs\n", len(configSlice))
+	return configSlice
 }

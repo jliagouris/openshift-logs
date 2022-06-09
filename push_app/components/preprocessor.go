@@ -32,7 +32,10 @@ func MakePreprocessor(numProducers int, LogChan <-chan Log, DataShareChan chan<-
 
 // PreprocessLoop Goroutine that iteratively processes logs passed by parser
 func (p *Preprocessor) PreprocessLoop() {
+	//logCnt := 0
 	for log := range p.LogChan {
+		//logCnt++
+		//fmt.Printf("logCnt: %v\n", logCnt)
 		dataShares := p.log2DataShares(log)
 
 		// Send data shares to the channel
@@ -44,10 +47,10 @@ func (p *Preprocessor) PreprocessLoop() {
 
 // Generate Data shares from log
 func (p *Preprocessor) log2DataShares(log Log) []DataShare {
-	//TODO: Fill this
+	//TODO: This is currently generating naive test data, will need to change
 	if !log.EOF {
 		share1 := DataShare{
-			ProducerIdArr: []int{2, 3},
+			ProducerIdArr: []int{1, 2},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.topic, Partition: kafka.PartitionAny},
 				Value:          []byte(strconv.Itoa(log.val)),
@@ -55,9 +58,8 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 			},
 			EOF: false,
 		}
-		p.DataShareChan <- share1
 		share2 := DataShare{
-			ProducerIdArr: []int{1, 3},
+			ProducerIdArr: []int{0, 2},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.topic, Partition: kafka.PartitionAny},
 				Value:          []byte(strconv.Itoa(log.val)),
@@ -66,7 +68,7 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 			EOF: false,
 		}
 		share3 := DataShare{
-			ProducerIdArr: []int{2, 3},
+			ProducerIdArr: []int{0, 1},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.topic, Partition: kafka.PartitionAny},
 				Value:          []byte(strconv.Itoa(log.val)),
@@ -77,7 +79,7 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 		return []DataShare{share1, share2, share3}
 	} else {
 		share := DataShare{
-			ProducerIdArr: []int{1, 2, 3},
+			ProducerIdArr: []int{0, 1, 2},
 			EOF:           true,
 		}
 		return []DataShare{share}
