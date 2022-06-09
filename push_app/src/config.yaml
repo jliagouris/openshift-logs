@@ -1,0 +1,34 @@
+parserConfig:
+  authToken: ABC
+  xScopeOrgID: cluster-infra-logs
+  query: "{cluster_log_level="infra-logs", openshift_cluster="moc/smaug"}"
+  start: 1654004480
+  end: 1654008080
+  limit: 5000
+  logSchema:
+    - key: cluster_log_level
+      nullable: false
+    - key: docker_container_id
+      nullable: true
+    - key: k8s_namespace_name
+      nullable: true
+    - key: kubernetes_container_image_id
+      nullable: true
+    - key: kubernetes_container_name
+      nullable: true
+    - key: kubernetes_host
+      nullable: true
+    - key: kubernetes_labels_app
+      nullable: true
+    - key: kubernetes_labels_pod_template_hash
+      nullable: true
+    - key: kubernetes_master_url
+      nullable: true
+    - key: kubernetes_namespace_labels_kubernetes_io_metadata_name
+      nullable: true
+    - key: kubernetes_namespace_labels_openshift_io_cluster_monitoring
+      nullable: true
+    - key: message
+      nullable: false
+    - key: ts
+      nullable: false
