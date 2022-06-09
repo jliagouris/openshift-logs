@@ -1,0 +1,32 @@
+---
+Clusters:
+  cluster_0:
+    bootstrap.servers: "pkc-epwny.eastus.azure.confluent.cloud:9092"
+    security.protocol: "SASL_SSL"
+    sasl.mechanisms: "PLAIN"
+    sasl.username: "XNZGLNHSXLMDUZ44"
+    sasl.password: "BBmFBIhcJboGXkMaNznYPFWSoF8T+yd+KJ/JBeO4f/wLFK5tWRmyTBG/bbJTSqL/"
+
+    # Best practice for higher availability in librdkafka clients prior to 1.7
+    session.timeout.ms: "45000"
+
+  cluster_1:
+    bootstrap.servers: "pkc-6ojv2.us-west4.gcp.confluent.cloud:9092"
+    security.protocol: "SASL_SSL"
+    sasl.mechanisms: "PLAIN"
+    sasl.username: "7ZBWWEMZBBDAIJNU"
+    sasl.password: "yCZR0cchS9xJz8FYfpXoEv3wJUl1gmwck4z6N1Pv/LFGFeW0F01O1t5b8Qpz+2bb"
+
+    # Best practice for higher availability in librdkafka clients prior to 1.7
+    session.timeout.ms: "45000"
+
+  cluster_2:
+    bootstrap.servers: "pkc-ymrq7.us-east-2.aws.confluent.cloud:9092"
+    security.protocol: "SASL_SSL"
+    sasl.mechanisms: "PLAIN"
+    sasl.username: "TYY4DXJVBSUX5C2R"
+    sasl.password: "vtwnf8AinhCkpA1layKDVM5RRVsG4ddK6HaquJFucQ/vN13rZhipiRE0U62XJWye"
+
+    # Best practice for higher availability in librdkafka clients prior to 1.7
+    session.timeout.ms: "45000"
+
