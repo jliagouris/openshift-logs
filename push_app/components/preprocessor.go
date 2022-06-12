@@ -1,6 +1,9 @@
 package components
 
 import (
+	"crypto/rand"
+	"encoding/binary"
+	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"strconv"
 )
@@ -53,7 +56,7 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 			ProducerIdArr: []int{1, 2},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.topic, Partition: kafka.PartitionAny},
-				Value:          []byte(strconv.Itoa(log.val)),
+				Value:          log.val,
 				Key:            []byte(strconv.Itoa(1)),
 			},
 			EOF: false,
@@ -62,7 +65,7 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 			ProducerIdArr: []int{0, 2},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.topic, Partition: kafka.PartitionAny},
-				Value:          []byte(strconv.Itoa(log.val)),
+				Value:          log.val,
 				Key:            []byte(strconv.Itoa(2)),
 			},
 			EOF: false,
@@ -71,7 +74,7 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 			ProducerIdArr: []int{0, 1},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.topic, Partition: kafka.PartitionAny},
-				Value:          []byte(strconv.Itoa(log.val)),
+				Value:          log.val,
 				Key:            []byte(strconv.Itoa(3)),
 			},
 			EOF: false,
@@ -84,4 +87,41 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 		}
 		return []DataShare{share}
 	}
+}
+
+const shareDataSize = 64
+
+func generateRandomBooleanShares(log Log) [][]byte {
+	shares := make([][]byte, 3)
+	for i := 0; i < 3; i++ {
+		shares[i] = make([]byte, shareDataSize>>3)
+	}
+	if _, err := rand.Read(shares[0]); err == nil {
+		fmt.Printf("Sth is wrong with generating random boolean share 0")
+	}
+	if _, err := rand.Read(shares[1]); err == nil {
+		fmt.Printf("Sth is wrong with generating random boolean share 1")
+	}
+	for i := range log.val {
+		shares[2][i] = log.val[i] ^ (shares[0][i] ^ shares[1][i])
+	}
+	return shares
+}
+
+func generateRandomIntShares(log Log) [][]byte {
+	shares := make([][]byte, 3)
+	for i := 0; i < 3; i++ {
+		shares[i] = make([]byte, shareDataSize>>3)
+	}
+	if _, err := rand.Read(shares[0]); err == nil {
+		fmt.Printf("Sth is wrong with generating random boolean share 0")
+	}
+	if _, err := rand.Read(shares[1]); err == nil {
+		fmt.Printf("Sth is wrong with generating random boolean share 1")
+	}
+	data := binary.LittleEndian.Uint64(log.val)
+	share0 := binary.LittleEndian.Uint64(shares[0])
+	share1 := binary.LittleEndian.Uint64(shares[1])
+	binary.LittleEndian.PutUint64(shares[2], data-(share0+share1))
+	return shares
 }
