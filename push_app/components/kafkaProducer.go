@@ -15,14 +15,6 @@ type KafkaProducer struct {
 	timeout int            // Producer timeout
 }
 
-/*
-// ProducerMessage Message sent to the producer. Wraps real data msg to be sent
-type ProducerMessage struct {
-	Msg   kafka.Message // msg contains log and any other information needed by Kafka
-	EOF   bool          // EOF indicates if all logs has been produces, and we can exit the loop
-}
-*/
-
 // ProduceLoop Goroutine that loops to push messages to Secrecy kafka broker
 func (p *KafkaProducer) ProduceLoop(wg *sync.WaitGroup) {
 

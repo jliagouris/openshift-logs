@@ -1,5 +1,10 @@
 package components
 
+import (
+	"encoding/binary"
+	"unsafe"
+)
+
 //Queries Loki
 
 // LogParser queries Loki logs, structure the log, and puts it into a channel shared with preprocessor
@@ -12,7 +17,7 @@ type LogParser struct {
 type Log struct {
 	EOF bool
 	//TODO: Fill this
-	val   int
+	val   []byte
 	topic string
 }
 
@@ -27,9 +32,11 @@ func MakeParser() *LogParser {
 func (parser *LogParser) ParseLoop() {
 	//TODO: //TODO: This is currently generating naive test data, will need to change
 	for i := 0; i < 10; i++ {
+		b := make([]byte, unsafe.Sizeof(uint64(i)))
+		binary.LittleEndian.PutUint64(b, uint64(i))
 		parser.LogChan <- Log{
 			EOF:   false,
-			val:   i,
+			val:   b,
 			topic: "naive_test",
 		}
 	}
