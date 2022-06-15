@@ -11,9 +11,10 @@ import (
 // Preprocesses logs queried by parser
 
 type Preprocessor struct {
-	LogChan       <-chan Log       // Channel shared with logParser, gets queried logs
-	DataShareChan chan<- DataShare // Channel shared with operator
-	numProducers  int              // Number of producers, used in producer decision
+	LogChan       <-chan Log     // Channel shared with logParser, gets queried logs
+	DataShareChan chan DataShare // Channel shared with operator
+	numProducers  int            // Number of producers, used in producer decision
+	producers     []*KafkaProducer
 }
 
 // DataShare is the preprocessed share of data to be sent to secrecy servers
@@ -24,11 +25,12 @@ type DataShare struct {
 }
 
 // MakePreprocessor Creates preprocessor object
-func MakePreprocessor(numProducers int, LogChan <-chan Log, DataShareChan chan<- DataShare) *Preprocessor {
+func MakePreprocessor(numProducers int, LogChan <-chan Log, DataShareChan chan DataShare, producers []*KafkaProducer) *Preprocessor {
 	preprocessor := Preprocessor{
 		LogChan:       LogChan,
 		DataShareChan: DataShareChan,
 		numProducers:  numProducers,
+		producers:     producers,
 	}
 	return &preprocessor
 }
@@ -36,6 +38,7 @@ func MakePreprocessor(numProducers int, LogChan <-chan Log, DataShareChan chan<-
 // PreprocessLoop Goroutine that iteratively processes logs passed by parser
 func (p *Preprocessor) PreprocessLoop() {
 	//logCnt := 0
+	go p.dispatchDataShareLoop()
 	for log := range p.LogChan {
 		//logCnt++
 		//fmt.Printf("logCnt: %v\n", logCnt)
@@ -44,6 +47,24 @@ func (p *Preprocessor) PreprocessLoop() {
 		// Send data shares to the channel
 		for _, dataShare := range dataShares {
 			p.DataShareChan <- dataShare
+		}
+	}
+}
+
+func (p *Preprocessor) dispatchDataShareLoop() {
+	//dataShareCnt := 0
+	for dataShare := range p.DataShareChan {
+		//dataShareCnt++
+		//fmt.Printf("Datashare cnt: %v\n", dataShareCnt)
+		//fmt.Printf("datashare content: %v\n", dataShare)
+		if dataShare.EOF {
+			for _, producer := range p.producers {
+				producer.MsgChan <- dataShare
+			}
+		} else {
+			for _, producerId := range dataShare.ProducerIdArr {
+				p.producers[producerId].MsgChan <- dataShare
+			}
 		}
 	}
 }

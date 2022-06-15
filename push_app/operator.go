@@ -41,7 +41,7 @@ func makePushOperator(confList []kafka.ConfigMap, producerTimeout int) *operator
 	}
 	pushOperator.parser = components.MakeParser() // TODO: This will change
 	DataShareChan := make(chan components.DataShare)
-	pushOperator.preprocessor = components.MakePreprocessor(len(confList), pushOperator.parser.LogChan, DataShareChan)
+	pushOperator.preprocessor = components.MakePreprocessor(len(confList), pushOperator.parser.LogChan, DataShareChan, pushOperator.producers)
 	pushOperator.dataShareChan = DataShareChan
 	return &pushOperator
 }
@@ -55,7 +55,7 @@ func (o *operator) run() {
 	go o.preprocessor.PreprocessLoop()
 
 	// Start dataShare dispatch goroutine
-	go o.dispatchDataShareLoop()
+	//go o.dispatchDataShareLoop()
 
 	// Start the producer goroutines
 	var wg sync.WaitGroup
@@ -66,6 +66,7 @@ func (o *operator) run() {
 	wg.Wait()
 }
 
+/*
 // Dispatch data shares to their designated producers
 func (o *operator) dispatchDataShareLoop() {
 	//dataShareCnt := 0
@@ -84,6 +85,7 @@ func (o *operator) dispatchDataShareLoop() {
 		}
 	}
 }
+*/
 
 /*
 // Turn a data share to Kafka messages

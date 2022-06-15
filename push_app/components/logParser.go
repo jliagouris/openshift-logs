@@ -1,8 +1,7 @@
 package components
 
 import (
-	"encoding/binary"
-	"unsafe"
+	"strconv"
 )
 
 //Queries Loki
@@ -32,11 +31,9 @@ func MakeParser() *LogParser {
 func (parser *LogParser) ParseLoop() {
 	//TODO: //TODO: This is currently generating naive test data, will need to change
 	for i := 0; i < 10; i++ {
-		b := make([]byte, unsafe.Sizeof(uint64(i)))
-		binary.LittleEndian.PutUint64(b, uint64(i))
 		parser.LogChan <- Log{
 			EOF:   false,
-			val:   b,
+			val:   []byte(strconv.Itoa(i)),
 			topic: "naive_test",
 		}
 	}
