@@ -17,10 +17,9 @@ var PRODUCER_TMO int
 
 // operator struct
 type operator struct {
-	parser        *components.LogParser
-	preprocessor  *components.Preprocessor
-	dataShareChan <-chan components.DataShare //channel shared by operator and preprocessor
-	producers     []*components.KafkaProducer
+	parser       *components.LogParser
+	preprocessor *components.Preprocessor
+	producers    []*components.KafkaProducer
 }
 
 // Main function of the operator
@@ -28,7 +27,6 @@ func main() {
 	PRODUCER_TMO = 15 * 1000 // This is an arbitrarily chosen timeout
 	conf := getConfig()
 	fmt.Printf("global conf: %v\n", conf.OpConf)
-	//clusterConfList := conf.ClusterConf.toClusterConfList()
 	pushOperator := makePushOperator(conf, PRODUCER_TMO)
 	pushOperator.run()
 }
@@ -45,7 +43,6 @@ func makePushOperator(conf Config, producerTimeout int) *operator {
 	pushOperator.parser = components.MakeParser(conf.OpConf.ChanBufSize) // TODO: This will change
 	DataShareChan := make(chan components.DataShare, conf.OpConf.ChanBufSize)
 	pushOperator.preprocessor = components.MakePreprocessor(len(clusterConfList), pushOperator.parser.LogChan, DataShareChan, pushOperator.producers)
-	pushOperator.dataShareChan = DataShareChan
 	return &pushOperator
 }
 
@@ -129,24 +126,3 @@ func getGlobalConfig(yamlFile []byte) OperatorConf {
 	}
 	return opConf
 }
-
-/*
-// Gets the configurations that allow the operator talk to the correct Kafka brokers
-func getKafkaConfigMap([]byte yamlFile) []kafka.ConfigMap {
-	clustersConf := Clusters{}
-	err = yaml.Unmarshal(yamlFile, &clustersConf)
-	if err != nil {
-		log.Fatalf("Unmarshal: %v", err)
-	}
-	configSlice := make([]kafka.ConfigMap, len(clustersConf.Confs))
-	idx := 0
-	for _, conf := range clustersConf.Confs {
-		//fmt.Printf(" server: %v\n", conf)
-		configSlice[idx] = conf
-		idx++
-	}
-	//fmt.Printf("Generated %v configs\n", configSlice)
-	//fmt.Printf("Generated %v configs\n", len(configSlice))
-	return configSlice
-}
-*/

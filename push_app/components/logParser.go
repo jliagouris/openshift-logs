@@ -31,7 +31,7 @@ func MakeParser(chanBufSize int) *LogParser {
 
 // ParseLoop Iteratively parse logs using Grafana Loki
 func (parser *LogParser) ParseLoop() {
-	//TODO: //TODO: This is currently generating naive test data, will need to change
+	//TODO: This is currently generating naive test data, will need to change
 	for i := 0; i < 10; i++ {
 		parser.LogChan <- Log{
 			EOF:   false,
