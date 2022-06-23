@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -21,9 +22,10 @@ type Log struct {
 }
 
 // MakeParser creates LogParser object, this definitely will change
-func MakeParser() *LogParser {
+func MakeParser(chanBufSize int) *LogParser {
 	//TODO: This will change
-	parser := LogParser{LogChan: make(chan Log)}
+	parser := LogParser{LogChan: make(chan Log, chanBufSize)}
+	fmt.Printf("parser channel buffer size: %v\n", cap(parser.LogChan))
 	return &parser
 }
 

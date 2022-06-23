@@ -79,7 +79,7 @@ func (p *KafkaProducer) Close() {
 
 // MakeKafkaProducer Creates producer object
 func MakeKafkaProducer(configMap *kafka.ConfigMap, msgChan chan DataShare, timeout int) *KafkaProducer {
-	//fmt.Println("Called MakeKafkaProducer")
+	fmt.Printf("producer channel buffer size: %v\n", cap(msgChan))
 
 	p, err := kafka.NewProducer(configMap)
 

@@ -1,4 +1,9 @@
 ---
+parallelism: 1
+chan_buf_size: 10
+push: 1
+pull: 0
+push_period: "1d"
 Clusters:
   cluster_0:
     bootstrap.servers: "pkc-epwny.eastus.azure.confluent.cloud:9092"
