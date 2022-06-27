@@ -11,15 +11,8 @@ import (
 type KafkaProducer struct {
 	producer *kafka.Producer // producer in confluent_kafka_go
 	//TODO: Buffered channels for better performance? Maybe?
-	MsgChan chan ProducerMessage // Get asynchronously generated messages through this channel
-	timeout int                  // Producer timeout
-}
-
-// ProducerMessage Message sent to the producer. Wraps real data msg to be sent
-type ProducerMessage struct {
-	msg   kafka.Message // msg contains log and any other information needed by Kafka
-	EOF   bool          // EOF indicates if all logs has been produces, and we can exit the loop
-	topic string        // topic the message to be sent to
+	MsgChan chan DataShare // Get asynchronously generated messages through this channel
+	timeout int            // Producer timeout
 }
 
 // ProduceLoop Goroutine that loops to push messages to Secrecy kafka broker
@@ -41,8 +34,11 @@ func (p *KafkaProducer) ProduceLoop(wg *sync.WaitGroup) {
 	}()
 
 	// Produce all msgs sent to the channel until receive a close msg
-	for producerMsg := range p.MsgChan {
-		p.produce(producerMsg.topic, &producerMsg.msg)
+	for dataShare := range p.MsgChan {
+		if dataShare.EOF {
+			break
+		}
+		p.produce(&dataShare.Message)
 	}
 
 	// Wait for all messages to be delivered
@@ -52,11 +48,11 @@ func (p *KafkaProducer) ProduceLoop(wg *sync.WaitGroup) {
 }
 
 // Wrapper of confluent_kafka produce method
-func (p *KafkaProducer) produce(topic string, msg *kafka.Message) {
+func (p *KafkaProducer) produce(msg *kafka.Message) {
 	//TODO: Do we need a delivery channel?
 	err := p.producer.Produce(msg, nil)
 	if err != nil {
-		return
+		fmt.Printf("An message failed to be sent\n")
 	}
 }
 
@@ -70,7 +66,7 @@ func (p *KafkaProducer) flush() {
 	//TODO: What do we do if some messages fail?
 	unsuccessfulMsgCnt := p.producer.Flush(p.timeout)
 	if unsuccessfulMsgCnt > 0 {
-		fmt.Printf("%v messages failed to deliever\n", unsuccessfulMsgCnt)
+		fmt.Printf("%v messages failed to be delievered\n", unsuccessfulMsgCnt)
 	} else {
 		fmt.Printf("All messages successfully delievered\n")
 	}
@@ -82,7 +78,9 @@ func (p *KafkaProducer) Close() {
 }
 
 // MakeKafkaProducer Creates producer object
-func MakeKafkaProducer(configMap *kafka.ConfigMap, msgChan chan ProducerMessage, timeout int) *KafkaProducer {
+func MakeKafkaProducer(configMap *kafka.ConfigMap, msgChan chan DataShare, timeout int) *KafkaProducer {
+	fmt.Printf("producer channel buffer size: %v\n", cap(msgChan))
+
 	p, err := kafka.NewProducer(configMap)
 
 	if err != nil {
