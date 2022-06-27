@@ -1,12 +1,12 @@
-package main
+package components
 
 import (
 	"io/ioutil"
 
-	"gopkg.in/yaml"
+	"gopkg.in/yaml.v3"
 )
 
-type Config struct {
+type LogConfig struct {
 	ParserConfig struct {
 		AuthToken   string `yaml:"authToken"`
 		XScopeOrgID string `yaml:"xScopeOrgID"`
@@ -21,7 +21,7 @@ type Config struct {
 	} `yaml:"parserConfig"`
 }
 
-func (cfg *Config) LoadConfig() error {
+func (cfg *LogConfig) LoadConfig() error {
 	if data, err := ioutil.ReadFile("config.yaml"); err != nil {
 		return err
 	} else {
