@@ -1,0 +1,72 @@
+---
+parallelism: 1
+chan_buf_size: 10
+push: 1
+pull: 0
+push_period: "1d"
+
+Clusters:
+  cluster_0:
+    bootstrap.servers: "pkc-epwny.eastus.azure.confluent.cloud:9092"
+    security.protocol: "SASL_SSL"
+    sasl.mechanisms: "PLAIN"
+    sasl.username: "XNZGLNHSXLMDUZ44"
+    sasl.password: "BBmFBIhcJboGXkMaNznYPFWSoF8T+yd+KJ/JBeO4f/wLFK5tWRmyTBG/bbJTSqL/"
+
+    # Best practice for higher availability in librdkafka clients prior to 1.7
+    session.timeout.ms: "45000"
+
+  cluster_1:
+    bootstrap.servers: "pkc-6ojv2.us-west4.gcp.confluent.cloud:9092"
+    security.protocol: "SASL_SSL"
+    sasl.mechanisms: "PLAIN"
+    sasl.username: "7ZBWWEMZBBDAIJNU"
+    sasl.password: "yCZR0cchS9xJz8FYfpXoEv3wJUl1gmwck4z6N1Pv/LFGFeW0F01O1t5b8Qpz+2bb"
+
+    # Best practice for higher availability in librdkafka clients prior to 1.7
+    session.timeout.ms: "45000"
+
+  cluster_2:
+    bootstrap.servers: "pkc-ymrq7.us-east-2.aws.confluent.cloud:9092"
+    security.protocol: "SASL_SSL"
+    sasl.mechanisms: "PLAIN"
+    sasl.username: "TYY4DXJVBSUX5C2R"
+    sasl.password: "vtwnf8AinhCkpA1layKDVM5RRVsG4ddK6HaquJFucQ/vN13rZhipiRE0U62XJWye"
+
+    # Best practice for higher availability in librdkafka clients prior to 1.7
+    session.timeout.ms: "45000"
+
+parserConfig:
+  authToken: ABC
+  xScopeOrgID: cluster-infra-logs
+  query: "{cluster_log_level="infra-logs", openshift_cluster="moc/smaug"}"
+  start: 1654004480
+  end: 1654008080
+  limit: 5000
+  logSchema:
+    - key: cluster_log_level
+      nullable: false
+    - key: docker_container_id
+      nullable: true
+    - key: k8s_namespace_name
+      nullable: true
+    - key: kubernetes_container_image_id
+      nullable: true
+    - key: kubernetes_container_name
+      nullable: true
+    - key: kubernetes_host
+      nullable: true
+    - key: kubernetes_labels_app
+      nullable: true
+    - key: kubernetes_labels_pod_template_hash
+      nullable: true
+    - key: kubernetes_master_url
+      nullable: true
+    - key: kubernetes_namespace_labels_kubernetes_io_metadata_name
+      nullable: true
+    - key: kubernetes_namespace_labels_openshift_io_cluster_monitoring
+      nullable: true
+    - key: message
+      nullable: false
+    - key: ts
+      nullable: false
