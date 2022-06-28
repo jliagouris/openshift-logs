@@ -4,12 +4,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"log"
 	"push_app/components"
 	"sync"
+
+	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"gopkg.in/yaml.v3"
 )
 
 // PRODUCER_TMO is the timeout for producers

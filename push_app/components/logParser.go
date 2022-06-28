@@ -23,6 +23,7 @@ func MakeParser(chanBufSize int, inLogChan chan Log, config LogConfig) *LogParse
 	return &parser
 }
 
+// Main goroutine for LogParser, checks for incoming log from InLogChan and parses it.
 func (parser *LogParser) Run() {
 	exit := false
 	for !exit {
@@ -32,10 +33,10 @@ func (parser *LogParser) Run() {
 				parser.LogChan <- log
 				exit = true
 			} else {
-				processedLog, err := parser.ProcessLog(log.val)
+				processedLog, err := parser.ProcessLog(log.Val)
 
 				if err == nil {
-					log.val = processedLog
+					log.Val = processedLog
 					parser.LogChan <- log
 				} else {
 					fmt.Println(err)
@@ -45,6 +46,7 @@ func (parser *LogParser) Run() {
 	}
 }
 
+// ProcessLog takes a log and matches the schema of the log with config	and returns the processed log.
 func (parser *LogParser) ProcessLog(log []byte) ([]byte, error) {
 	var parsedLog map[string]interface{}
 	err := json.Unmarshal(log, &parsedLog)
@@ -53,7 +55,7 @@ func (parser *LogParser) ProcessLog(log []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	var processedLog map[string]interface{}
+	processedLog := make(map[string]interface{})
 
 	for _, schema := range parser.config.ParserConfig.LogSchema {
 		if val, ok := parsedLog[schema.Key]; ok {
@@ -76,14 +78,18 @@ func (parser *LogParser) ProcessLog(log []byte) ([]byte, error) {
 	return processedLogBytes, nil
 }
 
+func (parser *LogParser) GetLogChan() chan Log {
+	return parser.LogChan
+}
+
 // ParseLoop Iteratively parse logs using Grafana Loki
 func (parser *LogParser) ParseLoop() {
 	//TODO: This is currently generating naive test data, will need to change
 	for i := 0; i < 10; i++ {
 		parser.LogChan <- Log{
 			EOF:   false,
-			val:   []byte(strconv.Itoa(i)),
-			topic: "naive_test",
+			Val:   []byte(strconv.Itoa(i)),
+			Topic: "naive_test",
 		}
 	}
 	parser.LogChan <- Log{EOF: true}

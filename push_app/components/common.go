@@ -4,6 +4,6 @@ package components
 type Log struct {
 	EOF bool
 	//TODO: Fill this
-	val   []byte
-	topic string
+	Val   []byte
+	Topic string
 }
