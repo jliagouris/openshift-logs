@@ -21,10 +21,10 @@ To support different scenarios, the application supports two service models: per
 of the two models are as follows: 
 
 Periodic Push:
-![image](pictures/push_workflow.png)
+![image](pictures/push.png)
 
 Ad-hoc Pull:
-![image](pictures/pull_workflow.png)
+![image](pictures/pull.png)
 
 # Configurable Parameters:
 The application supports a number of configurable parameters, all defined in config.yaml. For 
