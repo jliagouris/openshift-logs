@@ -21,6 +21,7 @@ type operator struct {
 	parser       *components.LogParser
 	preprocessor *components.Preprocessor
 	producers    []*components.KafkaProducer
+	dataSource   *components.LokiDataSource
 }
 
 // Main function of the operator
@@ -41,7 +42,14 @@ func makePushOperator(conf Config, producerTimeout int) *operator {
 		msgChan := make(chan components.DataShare, conf.OpConf.ChanBufSize)
 		pushOperator.producers[idx] = components.MakeKafkaProducer(&clusterConf, msgChan, producerTimeout)
 	}
-	pushOperator.parser = components.MakeParser(conf.OpConf.ChanBufSize) // TODO: This will change
+	//Get log config
+	config := components.LogConfig{}
+	err := config.LoadConfig()
+	if err != nil {
+		panic(err)
+	}
+	pushOperator.dataSource = components.MakeLokiDataSource(config)
+	pushOperator.parser = components.MakeParser(conf.OpConf.ChanBufSize, pushOperator.dataSource.GetLogChan(), config) // TODO: This will change
 	DataShareChan := make(chan components.DataShare, conf.OpConf.ChanBufSize)
 	pushOperator.preprocessor = components.MakePreprocessor(len(clusterConfList), pushOperator.parser.LogChan, DataShareChan, pushOperator.producers)
 	return &pushOperator
@@ -49,6 +57,10 @@ func makePushOperator(conf Config, producerTimeout int) *operator {
 
 // Main thread of the operator
 func (o *operator) run() {
+
+	// Activate data source
+	go o.dataSource.Run()
+
 	// Start parser goroutine
 	go o.parser.ParseLoop()
 
