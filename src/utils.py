@@ -13,5 +13,7 @@ def fetch_loki_logs(auth_token, x_scoppe_org_id, query, start, end, limit = 5000
     }
 
     response = requests.request("GET", url, headers=headers, data=payload)
+    print("response:")
+    print(response)
     data = response.json()['data']['result']
     return data
