@@ -1,0 +1,13 @@
+{
+    "stream": {
+        "cluster_log_level": "infra-logs",
+        "k8s_namespace_name": "openshift-storage",
+        "openshift_cluster": "moc/smaug"
+    },
+    "values": [
+        [
+            "1656094196647000000",
+            "{\"docker.container_id\":\"9af8ac1adc2d891741bb8aa085d0ca95aaa26cc07bd69d9f920a8413d139b545\",\"kubernetes.container_image\":\"registry.redhat.io/ocs4/mcg-core-rhel8@sha256:420911883cbd63efdb2807d9f72c7d146e4b388d50a7d764307010c768d7fe31\",\"kubernetes.container_image_id\":\"registry.redhat.io/ocs4/mcg-core-rhel8@sha256:420911883cbd63efdb2807d9f72c7d146e4b388d50a7d764307010c768d7fe31\",\"kubernetes.container_name\":\"endpoint\",\"kubernetes.host\":\"oct-03-08-compute\",\"kubernetes.labels.app\":\"noobaa\",\"kubernetes.labels.noobaa-s3\":\"noobaa\",\"kubernetes.labels.pod-template-hash\":\"666b85c67f\",\"kubernetes.master_url\":\"https://kubernetes.default.svc\",\"kubernetes.namespace_id\":\"b27bc8d8-da2b-4b50-8370-88775215a674\",\"kubernetes.namespace_labels.kubernetes_io/metadata_name\":\"openshift-storage\",\"kubernetes.namespace_labels.openshift_io/cluster-monitoring\":\"true\",\"kubernetes.namespace_name\":\"openshift-storage\",\"kubernetes.pod_id\":\"2fcaff6d-8503-4018-a201-088956849560\",\"kubernetes.pod_ip\":\"10.129.10.122\",\"kubernetes.pod_name\":\"noobaa-endpoint-666b85c67f-pvwv2\",\"message\":\"\\u001b[32mJun-24 18:09:56.647\\u001b[35m [Endpoint/11] \\u001b[36m   [L0]\\u001b[39m core.util.postgres_client:: vacuumAndAnalyze finished alertslogs\",\"message_key\":null,\"offset\":504219122,\"partition\":2,\"source_type\":\"kafka\",\"topic\":\"smaug-prod.cluster-logs.infrastructure\"}"
+        ]
+    ]
+}
