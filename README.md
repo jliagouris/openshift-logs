@@ -24,6 +24,16 @@ For generating API token (expires every 24 hours) please follow the steps below:
 - Click on 'Copy login command'    
 - Authenticate again and copy the token    
 
+### OpenShift Alets
+All alert related metrics are stored in Prometheus data source. To check out metric names, labels & other relevant information, select the campus icon on Grafana left side bar, choose the Prometheus source to query, e.g. moc-smaug. 
+![image](Resources/Pictures/grafana_metrics.png)
+
+For alert rules & details, click the alert icon on Grafana side bar, or check out [OpenShift Runbooks](https://github.com/openshift/runbooks).
+
+Alert rules aggregation queries are written in PromQL, for tutorial of PromQL, check out [PromQL Doc](https://prometheus.io/docs/prometheus/latest/querying/basics/).
+
+For plain language/SQL explaination of the aggregation queries, check out [here](alert_query_desc.md).
+
 ## Additional Documents
 - [Log Observations Journal](https://docs.google.com/document/d/1Pb0xdlxUSjIeKBK-z8UvV4CpFFLiU4pHJz5MjZUl3b8/edit?usp=sharing)   
 - [App Logs Schema](https://docs.google.com/spreadsheets/d/1rc27blmGv2Q7XQ95TIE6uYV3ZH4j88I7l_0s3AI_-AA/edit?usp=sharing)   
