@@ -1,6 +1,6 @@
 # Open Shift Logs
 
-_(Author: Adarsh Verma)_
+_(Author: Adarsh Verma, Jingyu Su)_
 
 This repository contains step-by-step instructions for setting up, accessing and querying logs from Operate First Clusters. Operate First is a concept where open source developers bring their projects to a production cloud during development where they can interact with a cloud provider’s operators and gain valuable feedback on the operational considerations of their project. The motivation for the Operate First initiative is the shift of focus from software availability to operating services. Open Source removed the access to software as a limiting factor for businesses and individuals. However, with software proliferating into every aspect of the business – and our world in general – resulting in ever growing complexity of software stacks, the challenge is now operationalizing software.
 
