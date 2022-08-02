@@ -46,7 +46,6 @@
 
    For: 15m
 
-
 4. [etcdDatabaseQuotaLowSpace](https://github.com/openshift/runbooks/blob/master/alerts/cluster-etcd-operator/etcdDatabaseQuotaLowSpace.md)  
    Query Rule:
    ```
@@ -63,5 +62,27 @@
    ```
    Description:  
    The pod container restarts more than 50% of the time during the last 10 minutes  
+
+   For: 15m
+
+6. [KubeDaemonSetNotScheduled](https://github.com/openshift/cluster-monitoring-operator/blob/aefc8fc5fc61c943dc1ca24b8c151940ae5f8f1c/assets/control-plane/prometheus-rule.yaml#L186-L195)
+   Query Rule:
+   ```
+    kube_daemonset_status_desired_number_scheduled{namespace=~"(openshift-.*|kube-.*|default|logging)",job="kube-state-metrics"}
+    -
+    kube_daemonset_status_current_number_scheduled{namespace=~"(openshift-.*|kube-.*|default|logging)",job="kube-state-metrics"} 
+    > 0
+   ```
+   Description:
+   Desired number of daemonset larger than scheduled, means some are not scheduled.
+
+   For: 10m
+
+7. [KubeJobFailed](https://github.com/openshift/cluster-monitoring-operator/blob/aefc8fc5fc61c943dc1ca24b8c151940ae5f8f1c/assets/control-plane/prometheus-rule.yaml#L186-L195)
+   Query Rule:
+   ```
+   kube_job_failed{namespace=~"(openshift-.*|kube-.*|default|logging)",job="kube-state-metrics"}  > 0
+   ```
+   Description: This one is self-explainatory.
 
    For: 15m
