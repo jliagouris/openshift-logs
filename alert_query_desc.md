@@ -46,6 +46,48 @@
 
    For: 15m
 
+   Example metric entries:
+   ```
+    kube_pod_status_phase{cluster="moc/smaug", container="kube-rbac-proxy-main", endpoint="https-main", job="kube-state-metrics", namespace="acme-operator", phase="Failed", pod="openshift-acme-54496d7cc7-hvfgf", prometheus="openshift-monitoring/k8s", service="kube-state-metrics"} = 1
+
+    kube_pod_owner{cluster="moc/smaug", container="kube-rbac-proxy-main", endpoint="https-main", job="kube-state-metrics", namespace="acme-operator", owner_is_controller="true", owner_kind="ReplicaSet", owner_name="openshift-acme-54496d7cc7", pod="openshift-acme-54496d7cc7-hvfgf", prometheus="openshift-monitoring/k8s", service="kube-state-metrics"} = 1
+   ```
+   The query
+   ```
+   max by(namespace, pod) (
+        kube_pod_status_phase{namespace=~"(openshift-.*|kube-.*|default|logging)",job="kube-state-metrics", phase=~"Pending|Unknown"}
+    )
+   ```
+   Gives: 
+   ```
+   {namespace="openshift-authentication", pod="oauth-openshift-84db7cff56-sfdrm"} = 1
+   ```
+   Similarly, 
+   ```
+   topk by(namespace, pod) (
+        1, max by(namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})
+    )
+   ```
+   Returns
+   ```
+   {namespace="openshift-authentication", owner_kind="ReplicaSet", pod="oauth-openshift-84db7cff56-sfdrm"} = 1
+   ```
+   *on(namespace, pod) group_left(owner_kind)* is like left join in SQL, on label namespace and pod. Attribute owner_kind attaches the owner_kind label to the multiplied result. So the result returned by
+   ```
+    max by(namespace, pod) (
+        kube_pod_status_phase{namespace=~"(openshift-.*|kube-.*|default|logging)",job="kube-state-metrics", phase=~"Pending|Unknown"}
+    ) 
+    * on(namespace, pod) group_left(owner_kind) 
+        topk by(namespace, pod) (
+        1, max by(namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})
+    )
+   ```
+   is:
+   ```
+    {namespace="openshift-authentication", owner_kind="ReplicaSet", pod="oauth-openshift-84db7cff56-f92kv"} = 1
+   ```
+   Sum over all filtered namespaces and pods, if the result is larger than 0, that means some pod is not ready.
+
 4. [etcdDatabaseQuotaLowSpace](https://github.com/openshift/runbooks/blob/master/alerts/cluster-etcd-operator/etcdDatabaseQuotaLowSpace.md)  
    Query Rule:
    ```
