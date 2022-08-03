@@ -195,8 +195,15 @@
 7. [KubeJobFailed](https://github.com/openshift/cluster-monitoring-operator/blob/aefc8fc5fc61c943dc1ca24b8c151940ae5f8f1c/assets/control-plane/prometheus-rule.yaml#L186-L195)
    Query Rule:
    ```
-   kube_job_failed{namespace=~"(openshift-.*|kube-.*|default|logging)",job="kube-state-metrics"}  > 0
+   kube_job_failed{namespace=~"(openshift-.*|kube-.*|default|logging)",job="kube-state-metrics"} > 0
    ```
    Description: This one is self-explainatory.
+
+   Pseudo SQL Equivalent:
+   ```sql
+   SELECT *
+   FROM kube_job_failed
+   WHERE namespace=~"(openshift-.*|kube-.*|default|logging)" AND job="kube-state-metrics" AND value > 0;
+   ```
 
    For: 15m
