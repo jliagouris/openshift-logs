@@ -58,6 +58,13 @@
         kube_pod_status_phase{namespace=~"(openshift-.*|kube-.*|default|logging)",job="kube-state-metrics", phase=~"Pending|Unknown"}
     )
    ```
+   is equivalent to the following SQL query:
+   ```sql
+   SELECT MAX(value) AS value, namespace, pod
+   FROM kube_pod_status_phase
+   WHERE namespace =~ "(openshift-.*|kube-.*|default|logging)" AND job = "kube-state-metrics" AND phase =~ "Pending|Unknown"
+   GROUP BY namespace, pod;
+   ```
    Gives: 
    ```
    {namespace="openshift-authentication", pod="oauth-openshift-84db7cff56-sfdrm"} = 1
@@ -68,11 +75,24 @@
         1, max by(namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})
     )
    ```
+   is equivalent to
+   ```sql
+   SELECT *
+   FROM (
+            SELECT MAX(value) AS value, namespace, pod, ownerkind
+            FROM kube_pod_owner
+            WHERE owner_kind != "Job"
+            GROUP BY namespace, pod, ownerkind
+        )
+   GROUP BY namespace, pod
+   ORDER BY value DESC
+   LIMIT 1
+   ```
    Returns
    ```
    {namespace="openshift-authentication", owner_kind="ReplicaSet", pod="oauth-openshift-84db7cff56-sfdrm"} = 1
    ```
-   *on(namespace, pod) group_left(owner_kind)* is like left join in SQL, on label namespace and pod. Attribute owner_kind attaches the owner_kind label to the multiplied result. So the result returned by
+   *on(namespace, pod) group_left(owner_kind)* is like left join in SQL, on label namespace and pod. Attribute owner_kind attaches the owner_kind label to the multiplied result. So 
    ```
     max by(namespace, pod) (
         kube_pod_status_phase{namespace=~"(openshift-.*|kube-.*|default|logging)",job="kube-state-metrics", phase=~"Pending|Unknown"}
@@ -82,7 +102,30 @@
         1, max by(namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})
     )
    ```
-   is:
+   is equivalent to:
+   ```sql
+   SELECT (T1.value * T2.value) AS value, T1.namespace, T1.pod, T2.owner_kind
+   FROM (
+           SELECT MAX(value) AS value, namespace, pod
+           FROM kube_pod_status_phase
+           WHERE namespace =~ "(openshift-.*|kube-.*|default|logging)" AND job = "kube-state-metrics" AND phase =~ "Pending|Unknown"
+           GROUP BY namespace, pod
+        ) AS T1, 
+        (
+           SELECT *
+           FROM (
+                   SELECT MAX(value) AS value, namespace, pod, ownerkind
+                   FROM kube_pod_owner
+                   WHERE owner_kind != "Job"
+                   GROUP BY namespace, pod, ownerkind
+                )
+           GROUP BY namespace, pod
+           ORDER BY value DESC
+           LIMIT 1
+        ) AS T2
+   WHERE T1.namespace = T2.namespace AND T1.pod = T2.pod
+   ```
+   result is:
    ```
     {namespace="openshift-authentication", owner_kind="ReplicaSet", pod="oauth-openshift-84db7cff56-f92kv"} = 1
    ```
