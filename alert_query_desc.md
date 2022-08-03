@@ -88,6 +88,35 @@
    ```
    Sum over all filtered namespaces and pods, if the result is larger than 0, that means some pod is not ready.
 
+   Pseudo SQL Equivalent:
+    ```sql
+    SELECT SUM(T3.value) AS sum, T3.namespace, T3.pod, T3.Time
+    FROM (
+        SELECT (T1.value * T2.value) AS value, T1.namespace, T1.pod, T2.owner_kind
+        FROM (
+                SELECT MAX(value) AS value, namespace, pod
+                FROM kube_pod_status_phase
+                WHERE namespace =~ "(openshift-.*|kube-.*|default|logging)" AND job = "kube-state-metrics" AND phase =~ "Pending|Unknown"
+                GROUP BY namespace, pod
+             ) AS T1, 
+             (
+                SELECT *
+                FROM (
+                        SELECT MAX(value) AS value, namespace, pod, ownerkind
+                        FROM kube_pod_owner
+                        WHERE owner_kind != "Job"
+                        GROUP BY namespace, pod, ownerkind
+                    )
+                GROUP BY namespace, pod
+                ORDER BY value DESC
+                LIMIT 1
+             ) AS T2
+        WHERE T1.namespace = T2.namespace AND T1.pod = T2.pod
+    ) AS T3
+    WHERE sum > 0
+    GROUP BY T3.namespace, T3.pod;
+    ```
+
 4. [etcdDatabaseQuotaLowSpace](https://github.com/openshift/runbooks/blob/master/alerts/cluster-etcd-operator/etcdDatabaseQuotaLowSpace.md)  
    Query Rule:
    ```
