@@ -9,6 +9,8 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
+// Need to add a spawning of the app in a pod when this is called
+
 const (
 	CONN_HOST = "localhost"
 	CONN_PORT = "1296"
