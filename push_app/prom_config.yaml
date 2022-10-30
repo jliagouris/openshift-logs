@@ -1,0 +1,5 @@
+---
+token: "<service account secret token>"
+route: "<prometheus service route>"
+query: "<query>"
+numWorker: 1
