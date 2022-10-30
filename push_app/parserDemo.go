@@ -1,5 +1,6 @@
 package main
 
+/*
 // Main file of log pushing operator
 
 import (
@@ -31,3 +32,4 @@ func Main() {
 		fmt.Printf("Output %s\n", string(log.Val))
 	}
 }
+*/

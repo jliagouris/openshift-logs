@@ -36,6 +36,7 @@ func (p *KafkaProducer) ProduceLoop(wg *sync.WaitGroup) {
 	// Produce all msgs sent to the channel until receive a close msg
 	for dataShare := range p.MsgChan {
 		if dataShare.EOF {
+			fmt.Println("Producer EOF")
 			break
 		}
 		p.produce(&dataShare.Message)

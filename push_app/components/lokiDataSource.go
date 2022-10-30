@@ -1,5 +1,6 @@
 package components
 
+/*
 import (
 	"encoding/json"
 	"io/ioutil"
@@ -187,6 +188,7 @@ func (ds *LokiDataSource) GetLogChan() chan Log {
 }
 
 // Creates new LokiDataSource
+
 func MakeLokiDataSource(config LogConfig) *LokiDataSource {
 	lokiDataSource := LokiDataSource{
 		config:     config,
@@ -197,3 +199,4 @@ func MakeLokiDataSource(config LogConfig) *LokiDataSource {
 
 	return &lokiDataSource
 }
+*/

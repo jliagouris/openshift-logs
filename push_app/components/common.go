@@ -4,6 +4,6 @@ package components
 type Log struct {
 	EOF bool
 	//TODO: Fill this
-	Val   []byte
+	Val   map[string]interface{}
 	Topic string
 }

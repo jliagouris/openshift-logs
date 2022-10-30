@@ -7,9 +7,9 @@ import (
 	"io/ioutil"
 	"log"
 	"push_app/components"
+	"push_app/configs"
 	"sync"
 
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"gopkg.in/yaml.v3"
 )
 
@@ -21,7 +21,7 @@ type operator struct {
 	parser       *components.LogParser
 	preprocessor *components.Preprocessor
 	producers    []*components.KafkaProducer
-	dataSource   *components.LokiDataSource
+	dataSource   *components.PrometheusDataSource
 }
 
 // Main function of the operator
@@ -35,23 +35,27 @@ func main() {
 
 // Create operator object
 func makePushOperator(conf Config, producerTimeout int) *operator {
-	clusterConfList := conf.ClusterConf.toClusterConfList()
+	clusterConfList := conf.KafkaConf.ToClusterConfList()
 	fmt.Printf("Generated %v configs\n", clusterConfList)
 	pushOperator := operator{producers: make([]*components.KafkaProducer, len(clusterConfList))}
 	for idx, clusterConf := range clusterConfList {
 		msgChan := make(chan components.DataShare, conf.OpConf.ChanBufSize)
 		pushOperator.producers[idx] = components.MakeKafkaProducer(&clusterConf, msgChan, producerTimeout)
 	}
-	//Get log config
+	//Get parser config
 	config := components.LogConfig{}
 	err := config.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
-	pushOperator.dataSource = components.MakeLokiDataSource(config)
-	pushOperator.parser = components.MakeParser(conf.OpConf.ChanBufSize, pushOperator.dataSource.GetLogChan(), config) // TODO: This will change
+	//pushOperator.dataSource = components.MakeLokiDataSource(config)
+	//datasource := components.MakeDataSource(conf.OpConf)
+	pushOperator.dataSource = components.MakePrometheusDataSource(conf.OpConf)
+	//fmt.Println("Datasource conf: ******************")
+	//fmt.Printf("%v\n", *pushOperator.dataSource.Conf)
+	pushOperator.parser = components.MakeParser(conf.OpConf.ChanBufSize, pushOperator.dataSource.GetDataChan(), config) // TODO: This will change
 	DataShareChan := make(chan components.DataShare, conf.OpConf.ChanBufSize)
-	pushOperator.preprocessor = components.MakePreprocessor(len(clusterConfList), pushOperator.parser.LogChan, DataShareChan, pushOperator.producers)
+	pushOperator.preprocessor = components.MakePreprocessor(len(clusterConfList), pushOperator.parser.ParsedChan, DataShareChan, pushOperator.producers)
 	return &pushOperator
 }
 
@@ -62,7 +66,7 @@ func (o *operator) run() {
 	go o.dataSource.Run()
 
 	// Start parser goroutine
-	go o.parser.ParseLoop()
+	go o.parser.Run()
 
 	// Start preprocessor goroutine
 	go o.preprocessor.PreprocessLoop()
@@ -76,34 +80,10 @@ func (o *operator) run() {
 	wg.Wait()
 }
 
-// Clusters Config of Kafka servers
-type Clusters struct {
-	Confs map[string]kafka.ConfigMap `yaml:"Clusters"`
-}
-
-// Turn Kafka server config map into slice required by Kafka-go package
-func (c *Clusters) toClusterConfList() []kafka.ConfigMap {
-	configSlice := make([]kafka.ConfigMap, len(c.Confs))
-	idx := 0
-	for _, conf := range c.Confs {
-		//fmt.Printf(" server: %v\n", conf)
-		configSlice[idx] = conf
-		idx++
-	}
-	//fmt.Printf("Generated %v configs\n", configSlice)
-	//fmt.Printf("Generated %v configs\n", len(configSlice))
-	return configSlice
-}
-
-// OperatorConf Global Operator Configs
-type OperatorConf struct {
-	ChanBufSize int `yaml:"chan_buf_size"`
-}
-
 // Config General config structure
 type Config struct {
-	ClusterConf Clusters
-	OpConf      OperatorConf
+	KafkaConf configs.KafkaClientConf
+	OpConf    configs.OperatorConf
 }
 
 // Get config from config file
@@ -114,14 +94,14 @@ func getConfig() Config {
 		log.Printf("yamlFile.Get err   #%v ", err)
 	}
 	config.OpConf = getGlobalConfig(yamlFile)
-	config.ClusterConf = getKafkaConfig(yamlFile)
+	config.KafkaConf = getKafkaConfig(yamlFile)
 	return config
 }
 
 // Get kafka cluster config
-func getKafkaConfig(yamlFile []byte) Clusters {
+func getKafkaConfig(yamlFile []byte) configs.KafkaClientConf {
 	yamlFile, _ = ioutil.ReadFile("config.yaml")
-	clustersConf := Clusters{}
+	clustersConf := configs.KafkaClientConf{}
 	err := yaml.Unmarshal(yamlFile, &clustersConf)
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)
@@ -131,8 +111,8 @@ func getKafkaConfig(yamlFile []byte) Clusters {
 }
 
 // Get global operator config
-func getGlobalConfig(yamlFile []byte) OperatorConf {
-	opConf := OperatorConf{ChanBufSize: 0}
+func getGlobalConfig(yamlFile []byte) configs.OperatorConf {
+	opConf := configs.OperatorConf{ChanBufSize: 0}
 	err := yaml.Unmarshal(yamlFile, &opConf)
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)
