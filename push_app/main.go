@@ -4,13 +4,12 @@ package main
 
 import (
 	"fmt"
+	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"log"
 	"push_app/components"
 	"push_app/configs"
 	"sync"
-
-	"gopkg.in/yaml.v3"
 )
 
 // PRODUCER_TMO is the timeout for producers

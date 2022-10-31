@@ -66,7 +66,6 @@ func (p *Preprocessor) dispatchDataShareLoop() {
 			for _, producer := range p.producers {
 				producer.MsgChan <- dataShare
 			}
-			//break
 		} else {
 			for _, producerId := range dataShare.ProducerIdArr {
 				p.producers[producerId].MsgChan <- dataShare

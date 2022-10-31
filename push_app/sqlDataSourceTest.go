@@ -1,10 +1,5 @@
 package main
 
-import (
-	_ "github.com/go-sql-driver/mysql"
-	//"time"
-)
-
 /*
 func main() {
 	db, err := sql.Open("mysql", "push_app:JesusS980721!@/log_database")
