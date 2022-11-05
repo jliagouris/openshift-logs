@@ -63,12 +63,15 @@ func (parser *LogParser) ParseLog(log PrometheusMetric) (map[string]interface{},
 			return nil, err
 		}
 	*/
-
+	fmt.Printf("parse log PrometheusMetric: %v\n", log)
 	var rawMetrics map[string]interface{}
 	data, _ := json.Marshal(log.Metric)
 	json.Unmarshal(data, &rawMetrics)
 	rawMetrics["value"] = log.Values
+	fmt.Printf("parse log rawMetrics: %v\n", rawMetrics)
 	processedLog := make(map[string]interface{})
+	fmt.Printf("parse log processedlog: %v\n", processedLog)
+	fmt.Printf("parse log logschema: %v\n", parser.config.ParserConfig.LogSchema)
 	for _, schema := range parser.config.ParserConfig.LogSchema {
 		if val, ok := rawMetrics[schema.Key]; ok {
 			processedLog[schema.Key] = val

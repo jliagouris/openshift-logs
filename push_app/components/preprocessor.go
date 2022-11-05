@@ -5,10 +5,8 @@ import (
 	"crypto/rand"
 	"encoding/binary"
 	"encoding/gob"
-	"encoding/json"
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"log"
 	"strconv"
 )
 
@@ -79,6 +77,9 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 	//TODO: This is currently using only values of metrics, will need to change to support integer
 	if !log.EOF {
 		secretByteArr := createDataShares(log.Val)
+		//var map1 map[string]interface{}
+		//json.Unmarshal(secretByteArr[0], &map1)
+		fmt.Printf("map1: %v\n", binary.BigEndian.Uint64(secretByteArr[0]))
 		share1 := DataShare{
 			ProducerIdArr: []int{1, 2},
 			Message: kafka.Message{
@@ -117,29 +118,45 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 }
 
 func createDataShares(metrics map[string]interface{}) [][]byte {
-	mapArr := make([]map[string][]byte, 3)
-	mapArr[0] = make(map[string][]byte)
-	mapArr[1] = make(map[string][]byte)
-	mapArr[2] = make(map[string][]byte)
-	for key, val := range metrics {
-		valBytes, _ := GetBytes(val)
-		valByteArr := generateRandomIntShares(valBytes)
-		mapArr[0][key] = valByteArr[0]
-		mapArr[1][key] = valByteArr[1]
-		mapArr[2][key] = valByteArr[2]
-	}
-	var bytesArr [][]byte
-	for valMap := range mapArr {
-		jsonBytes, err := json.Marshal(valMap)
-		if err != nil {
-			log.Println("Problem in preprocessor: fail to serialize values in createDataShares")
+	fmt.Printf("metrics: %v\n", metrics)
+	/*
+		mapArr := make([]map[string][]byte, 3)
+		mapArr[0] = make(map[string][]byte)
+		mapArr[1] = make(map[string][]byte)
+		mapArr[2] = make(map[string][]byte)
+		for key, val := range metrics {
+			valBytes, _ := GetBytes(val)
+			valByteArr := generateRandomIntShares(valBytes)
+			mapArr[0][key] = valByteArr[0]
+			mapArr[1][key] = valByteArr[1]
+			mapArr[2][key] = valByteArr[2]
 		}
-		bytesArr = append(bytesArr, jsonBytes)
-	}
-	return bytesArr
+		fmt.Printf("mapArr[0]: %v\n", mapArr[0])
+		var bytesArr [][]byte
+		for _, valMap := range mapArr {
+			fmt.Printf("valMap: %v\n", valMap)
+			jsonBytes, err := json.Marshal(&valMap)
+			fmt.Printf("unmarshalled json bytes: %v\n", string(jsonBytes))
+			if err != nil {
+				log.Println("Problem in preprocessor: fail to serialize values in createDataShares")
+			}
+			bytesArr = append(bytesArr, jsonBytes)
+		}
+	*/
+	valBytes, _ := GetBytes(metrics["value"])
+	valByteArr := generateRandomIntShares(valBytes)
+	return valByteArr
 }
 
 func GetBytes(key interface{}) ([]byte, error) {
+	//fmt.Printf("GetBytes input type: %v\n", key)
+	switch v := key.(type) {
+	case int:
+		//fmt.Printf("int type: %v\n", v)
+		bs := make([]byte, 8)
+		binary.BigEndian.PutUint64(bs, uint64(v))
+		return bs, nil
+	}
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
 	err := enc.Encode(key)
@@ -149,7 +166,7 @@ func GetBytes(key interface{}) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-const shareDataSize = 64
+const shareDataSize = 8
 
 /*
 func generateRandomBooleanShares(log Log) [][]byte {
@@ -170,19 +187,28 @@ func generateRandomBooleanShares(log Log) [][]byte {
 }
 */
 func generateRandomIntShares(intBytes []byte) [][]byte {
+	//data1 := binary.BigEndian.Uint64(intBytes)
+	//fmt.Printf("int bytes: %v\n", intBytes)
 	shares := make([][]byte, 3)
 	for i := 0; i < 3; i++ {
-		shares[i] = make([]byte, shareDataSize>>3)
+		shares[i] = make([]byte, shareDataSize)
+		shares[i][0] = 0
 	}
-	if _, err := rand.Read(shares[0]); err == nil {
-		fmt.Printf("Sth is wrong with generating random boolean share 0")
+	if _, err := rand.Read(shares[0]); err != nil {
+		fmt.Printf("Sth is wrong with generating random boolean share 0: %v\n", err)
 	}
-	if _, err := rand.Read(shares[1]); err == nil {
-		fmt.Printf("Sth is wrong with generating random boolean share 1")
+	if _, err := rand.Read(shares[1]); err != nil {
+		fmt.Printf("Sth is wrong with generating random boolean share 1: %v\n", err)
 	}
-	data := binary.LittleEndian.Uint64(intBytes)
-	share0 := binary.LittleEndian.Uint64(shares[0])
-	share1 := binary.LittleEndian.Uint64(shares[1])
-	binary.LittleEndian.PutUint64(shares[2], data-(share0+share1))
+	data := binary.BigEndian.Uint64(intBytes)
+	//fmt.Printf("data: %v\n", data)
+	share0 := binary.BigEndian.Uint64(shares[0])
+	//fmt.Printf("share0: %v\n", share0)
+	share1 := binary.BigEndian.Uint64(shares[1])
+	//fmt.Printf("share1: %v\n", share1)
+	binary.BigEndian.PutUint64(shares[2], data-(share0+share1))
+	//fmt.Printf("share2 int: %v\n", data-(share0+share1))
+	//fmt.Printf("share2: %v\n", binary.BigEndian.Uint64(shares[2]))
+	//fmt.Printf("sum data: %v\n", share0+share1+binary.BigEndian.Uint64(shares[2]))
 	return shares
 }

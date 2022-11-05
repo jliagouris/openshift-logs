@@ -18,7 +18,7 @@ type LogConfig struct {
 		LogSchema []struct {
 			Key      string `yaml:"key"`
 			Nullable bool   `yaml:"nullable"`
-		} `yaml:"schema"`
+		} `yaml:"logSchema"`
 	} `yaml:"parserConfig"`
 }
 
