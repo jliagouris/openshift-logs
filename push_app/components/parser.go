@@ -43,7 +43,7 @@ func (parser *LogParser) Run() {
 					parser.ParsedChan <- Log{
 						EOF:   false,
 						Val:   parsedMap,
-						Topic: parser.config.ParserConfig.Topic,
+						Topic: log.Topic,
 					}
 				} else {
 					fmt.Println(err)
@@ -72,16 +72,19 @@ func (parser *LogParser) ParseLog(log PrometheusMetric) (map[string]interface{},
 	processedLog := make(map[string]interface{})
 	fmt.Printf("parse log processedlog: %v\n", processedLog)
 	fmt.Printf("parse log logschema: %v\n", parser.config.ParserConfig.LogSchema)
-	for _, schema := range parser.config.ParserConfig.LogSchema {
-		if val, ok := rawMetrics[schema.Key]; ok {
-			processedLog[schema.Key] = val
+	for _, key := range log.Keys {
+		if val, ok := rawMetrics[key]; ok {
+			processedLog[key] = val
 		} else {
+			return nil, fmt.Errorf("Missing required field: %v", key)
+		}
+		/*else {
 			if schema.Nullable {
 				processedLog[schema.Key] = nil
 			} else {
 				return nil, fmt.Errorf("Missing required field: %v", schema.Key)
 			}
-		}
+		}*/
 	}
 
 	/*

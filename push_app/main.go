@@ -1,6 +1,6 @@
 package main
 
-// Main file of log pushing operator
+// Main file of log pushing adHocOperator
 
 import (
 	"fmt"
@@ -15,31 +15,32 @@ import (
 // PRODUCER_TMO is the timeout for producers
 var PRODUCER_TMO int
 
-// operator struct
-type operator struct {
+// adHocOperator struct
+type adHocOperator struct {
 	parser       *components.LogParser
 	preprocessor *components.Preprocessor
 	producers    []*components.KafkaProducer
 	dataSource   *components.PrometheusDataSource
+	listener     *components.AdHocListener
 }
 
-// Main function of the operator
+// Main function of the adHocOperator
 func main() {
 	PRODUCER_TMO = 15 * 1000 // This is an arbitrarily chosen timeout
 	conf := getConfig()
 	fmt.Printf("global conf: %v\n", conf.OpConf)
-	pushOperator := makePushOperator(conf, PRODUCER_TMO)
+	pushOperator := makeOperator(conf, PRODUCER_TMO)
 	pushOperator.run()
 }
 
-// Create operator object
-func makePushOperator(conf Config, producerTimeout int) *operator {
+// Create adHocOperator object
+func makeOperator(conf Config, producerTimeout int) *adHocOperator {
 	clusterConfList := conf.KafkaConf.ToClusterConfList()
 	fmt.Printf("Generated %v configs\n", clusterConfList)
-	pushOperator := operator{producers: make([]*components.KafkaProducer, len(clusterConfList))}
+	ahOperator := adHocOperator{producers: make([]*components.KafkaProducer, len(clusterConfList))}
 	for idx, clusterConf := range clusterConfList {
 		msgChan := make(chan components.DataShare, conf.OpConf.ChanBufSize)
-		pushOperator.producers[idx] = components.MakeKafkaProducer(&clusterConf, msgChan, producerTimeout)
+		ahOperator.producers[idx] = components.MakeKafkaProducer(&clusterConf, msgChan, producerTimeout)
 	}
 	//Get parser config
 	config := components.LogConfig{}
@@ -47,19 +48,20 @@ func makePushOperator(conf Config, producerTimeout int) *operator {
 	if err != nil {
 		panic(err)
 	}
-	//pushOperator.dataSource = components.MakeLokiDataSource(config)
+	//ahOperator.dataSource = components.MakeLokiDataSource(config)
 	//datasource := components.MakeDataSource(conf.OpConf)
-	pushOperator.dataSource = components.MakePrometheusDataSource(conf.OpConf)
+	ahOperator.listener = components.MakeListener(conf.OpConf)
+	ahOperator.dataSource = components.MakePrometheusDataSource(conf.OpConf, ahOperator.listener.GetQueryChan())
 	//fmt.Println("Datasource conf: ******************")
-	//fmt.Printf("%v\n", *pushOperator.dataSource.Conf)
-	pushOperator.parser = components.MakeParser(conf.OpConf.ChanBufSize, pushOperator.dataSource.GetDataChan(), config) // TODO: This will change
+	//fmt.Printf("%v\n", *ahOperator.dataSource.Conf)
+	ahOperator.parser = components.MakeParser(conf.OpConf.ChanBufSize, ahOperator.dataSource.GetDataChan(), config) // TODO: This will change
 	DataShareChan := make(chan components.DataShare, conf.OpConf.ChanBufSize)
-	pushOperator.preprocessor = components.MakePreprocessor(len(clusterConfList), pushOperator.parser.ParsedChan, DataShareChan, pushOperator.producers)
-	return &pushOperator
+	ahOperator.preprocessor = components.MakePreprocessor(len(clusterConfList), ahOperator.parser.ParsedChan, DataShareChan, ahOperator.producers)
+	return &ahOperator
 }
 
-// Main thread of the operator
-func (o *operator) run() {
+// Main thread of the adHocOperator
+func (o *adHocOperator) run() {
 
 	// Activate data source
 	go o.dataSource.Run()
@@ -109,7 +111,7 @@ func getKafkaConfig(yamlFile []byte) configs.KafkaClientConf {
 	return clustersConf
 }
 
-// Get global operator config
+// Get global adHocOperator config
 func getGlobalConfig(yamlFile []byte) configs.OperatorConf {
 	opConf := configs.OperatorConf{ChanBufSize: 0}
 	err := yaml.Unmarshal(yamlFile, &opConf)

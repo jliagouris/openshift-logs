@@ -1,7 +1,7 @@
 package main
 
 /*
-// Main file of log pushing operator
+// Main file of log pushing adHocOperator
 
 import (
 	"fmt"
