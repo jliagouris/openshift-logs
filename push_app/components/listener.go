@@ -3,6 +3,7 @@ package components
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -32,7 +33,10 @@ func (l *AdHocListener) handler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	go func() { l.QueryChan <- t }()
+	fmt.Printf("decoded query: %v\n", t)
+	//go func() { l.QueryChan <- t }()
+	l.QueryChan <- t
+	fmt.Println("handler finished")
 	/*
 		// Send req using http Client
 		client := &http.Client{}
@@ -61,7 +65,7 @@ func readinessHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (l *AdHocListener) run() {
+func (l *AdHocListener) Run() {
 	// Create Server and Route Handlers
 	r := mux.NewRouter()
 
@@ -71,7 +75,7 @@ func (l *AdHocListener) run() {
 
 	srv := &http.Server{
 		Handler:      r,
-		Addr:         ":8080",
+		Addr:         ":8083",
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}

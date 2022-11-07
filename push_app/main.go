@@ -63,6 +63,9 @@ func makeOperator(conf Config, producerTimeout int) *adHocOperator {
 // Main thread of the adHocOperator
 func (o *adHocOperator) run() {
 
+	//Start listener
+	go o.listener.Run()
+
 	// Activate data source
 	go o.dataSource.Run()
 

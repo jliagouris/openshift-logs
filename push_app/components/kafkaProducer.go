@@ -37,13 +37,14 @@ func (p *KafkaProducer) ProduceLoop(wg *sync.WaitGroup) {
 	for dataShare := range p.MsgChan {
 		if dataShare.EOF {
 			fmt.Println("Producer EOF")
-			break
+			//break
+			p.flush()
+			continue
 		}
 		p.produce(&dataShare.Message)
 	}
 
 	// Wait for all messages to be delivered
-	p.flush()
 	p.Close()
 	wg.Done()
 }
