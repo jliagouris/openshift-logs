@@ -1,4 +1,5 @@
-Q1.
+Q1. Whether or not total cpu utilization per second of container "etcd" is greater than 0.2
+sum by (container) (rate(container_cpu_usage_seconds_total{container="etcd"}[30m])) > 0.20 > bool 0.20
 
 Q2. top 5 containers whose cpu_util > 0 for past <time_interval> (30m)
 topk(5, sum by (container) (rate(container_cpu_usage_seconds_total{container=~".+"}[30m])) > 0)
