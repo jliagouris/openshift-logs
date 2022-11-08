@@ -1,0 +1,4 @@
+Q1.
+
+Q2. top 5 containers whose cpu_util > 0 for past <time_interval> (30m)
+topk(5, sum by (container) (rate(container_cpu_usage_seconds_total{container=~".+"}[30m])) > 0)
