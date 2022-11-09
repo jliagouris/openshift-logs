@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"push_app/Response"
 	"push_app/configs"
 	"strconv"
@@ -35,11 +36,14 @@ type PrometheusMetric struct {
 }
 
 func (ps PrometheusDataSource) Run() error {
-	url := "https://" + ps.Conf.Route + "/api/v1/query" + "?query=" + ps.Conf.Query
+	fmt.Printf("Query is: %v\n", ps.Conf.Query)
+	params := url.Values{}
+	params.Add("query", ps.Conf.Query)
+	queryUrl := "https://" + ps.Conf.Route + "/api/v1/query?" + params.Encode()
 	var bearer = "Bearer " + ps.Conf.Token
 
 	// Create a new request using http
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", queryUrl, nil)
 
 	// add authorization header to the req
 	req.Header.Add("Authorization", bearer)
@@ -58,7 +62,7 @@ func (ps PrometheusDataSource) Run() error {
 		log.Println("Error while reading the response bytes:", err)
 		return err
 	}
-
+	fmt.Printf("promql body: %v\n", string(body))
 	respJson := Response.PrometheusResponse{}
 	ps.ParseResponse(body, &respJson)
 	for _, result := range respJson.Data.Result {
@@ -88,7 +92,7 @@ func (ps PrometheusDataSource) Run() error {
 func (ps PrometheusDataSource) ParseResponse(body []byte, promResp *Response.PrometheusResponse) {
 	err := json.Unmarshal(body, promResp)
 	if err != nil {
-		log.Println("JSON Error:", err)
+		log.Println("JSON Error in Parse Response:", err)
 		return
 	}
 	//log.Println("JSON Response:", string(body))
