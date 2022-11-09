@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"push_app/Response"
 	"push_app/configs"
 	"strconv"
@@ -39,11 +40,14 @@ type PrometheusMetric struct {
 
 func (ps PrometheusDataSource) Run() error {
 	for query := range ps.QueryChan {
-		url := "https://" + ps.Conf.Route + "/api/v1/query" + "?query=" + query.Query
+		params := url.Values{}
+		params.Add("query", query.Query)
+		//queryUrl := "https://" + ps.Conf.Route + "/api/v1/query?" + params.Encode()
+		queryUrl := "https://" + ps.Conf.Route + "/api/v1/query?" + params.Encode()
 		var bearer = "Bearer " + ps.Conf.Token
 
 		// Create a new request using http
-		req, err := http.NewRequest("GET", url, nil)
+		req, err := http.NewRequest("GET", queryUrl, nil)
 
 		// add authorization header to the req
 		req.Header.Add("Authorization", bearer)
