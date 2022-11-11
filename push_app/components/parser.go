@@ -42,6 +42,7 @@ func (parser *LogParser) Run() {
 					EOF:   false,
 					Val:   parsedMap,
 					Topic: log.Topic,
+					Key:   log.DataKey,
 				}
 			} else {
 				fmt.Println(err)

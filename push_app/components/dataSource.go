@@ -32,13 +32,16 @@ type PrometheusMetric struct {
 		Job        string
 		Service    string
 	}
-	Values int
-	Topic  string
-	Keys   []string
-	EOF    bool
+	Values  int
+	Topic   string
+	DataKey DataShareKey
+	Keys    []string
+	EOF     bool
 }
 
 func (ps PrometheusDataSource) Run() error {
+	var queryId uint32
+	queryId = 0
 	for query := range ps.QueryChan {
 		params := url.Values{}
 		params.Add("query", query.Query)
@@ -59,7 +62,6 @@ func (ps PrometheusDataSource) Run() error {
 			log.Println("Error on response.\n[ERROR] -", err)
 			return err
 		}
-		defer resp.Body.Close()
 
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
@@ -70,6 +72,8 @@ func (ps PrometheusDataSource) Run() error {
 		respJson := Response.PrometheusResponse{}
 		ps.ParseResponse(body, &respJson)
 		for _, result := range respJson.Data.Result {
+			var seqNum uint32
+			seqNum = 0
 			valueStr := fmt.Sprintf("%v", result.Values[1])
 			value, err := strconv.Atoi(valueStr)
 			if err != nil {
@@ -89,9 +93,17 @@ func (ps PrometheusDataSource) Run() error {
 				Values: value,
 				Topic:  query.Topic,
 				Keys:   query.Keys,
+				DataKey: DataShareKey{
+					ClientId: ps.Conf.ClientId,
+					QueryId:  queryId,
+					SeqNum:   seqNum,
+				},
 			}
+			seqNum++
 		}
 		ps.RawDataChan <- PrometheusMetric{EOF: true}
+		queryId++
+		resp.Body.Close()
 	}
 	return nil
 }
@@ -124,6 +136,7 @@ func MakePrometheusDataSource(opConfig configs.OperatorConf, queryChan chan AdHo
 	ps.RawDataChan = make(chan PrometheusMetric, opConfig.ChanBufSize)
 	promConf := &configs.PrometheusConf{}
 	promConf.LoadConfig()
+	promConf.ClientId = opConfig.ClientId
 	ps.Conf = promConf
 	return &ps
 }

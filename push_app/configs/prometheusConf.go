@@ -11,6 +11,7 @@ type PrometheusConf struct {
 	Token     string `yaml:"token"`
 	Query     string `yaml:"query"`
 	NumWorker int    `yaml:"numWorker"`
+	ClientId  string
 }
 
 func (ps *PrometheusConf) LoadConfig() error {

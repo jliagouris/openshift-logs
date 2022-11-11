@@ -5,9 +5,9 @@ import (
 	"crypto/rand"
 	"encoding/binary"
 	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"strconv"
 )
 
 // Preprocesses logs queried by parser
@@ -79,13 +79,18 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 		secretByteArr := createDataShares(log.Val)
 		//var map1 map[string]interface{}
 		//json.Unmarshal(secretByteArr[0], &map1)
+		keyBytes, err := json.Marshal(log.Key)
+		if err != nil {
+			fmt.Println("error in log 2 datashares getting key byte array:", err)
+		}
+		fmt.Printf("Generated key: %v\n", string(keyBytes))
 		fmt.Printf("map1: %v\n", binary.BigEndian.Uint64(secretByteArr[0]))
 		share1 := DataShare{
 			ProducerIdArr: []int{1, 2},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.Topic, Partition: kafka.PartitionAny},
 				Value:          secretByteArr[0],
-				Key:            []byte(strconv.Itoa(1)),
+				Key:            keyBytes,
 			},
 			EOF: false,
 		}
@@ -94,7 +99,7 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.Topic, Partition: kafka.PartitionAny},
 				Value:          secretByteArr[1],
-				Key:            []byte(strconv.Itoa(2)),
+				Key:            keyBytes,
 			},
 			EOF: false,
 		}
@@ -103,7 +108,7 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.Topic, Partition: kafka.PartitionAny},
 				Value:          secretByteArr[2],
-				Key:            []byte(strconv.Itoa(3)),
+				Key:            keyBytes,
 			},
 			EOF: false,
 		}
