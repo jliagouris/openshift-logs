@@ -5,9 +5,9 @@ import (
 	"crypto/rand"
 	"encoding/binary"
 	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"strconv"
 )
 
 // Preprocesses logs queried by parser
@@ -74,18 +74,22 @@ func (p *Preprocessor) dispatchDataShareLoop() {
 
 // Generate Data shares from log
 func (p *Preprocessor) log2DataShares(log Log) []DataShare {
-	//TODO: This is currently using only values of metrics, will need to change to support integer
 	if !log.EOF {
 		secretByteArr := createDataShares(log.Val)
 		//var map1 map[string]interface{}
 		//json.Unmarshal(secretByteArr[0], &map1)
+		keyBytes, err := json.Marshal(log.Key)
+		if err != nil {
+			fmt.Println("error in log 2 datashares getting key byte array:", err)
+		}
+		fmt.Printf("Generated key: %v\n", string(keyBytes))
 		fmt.Printf("map1: %v\n", binary.BigEndian.Uint64(secretByteArr[0]))
 		share1 := DataShare{
 			ProducerIdArr: []int{1, 2},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.Topic, Partition: kafka.PartitionAny},
 				Value:          secretByteArr[0],
-				Key:            []byte(strconv.Itoa(1)),
+				Key:            keyBytes,
 			},
 			EOF: false,
 		}
@@ -94,7 +98,7 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.Topic, Partition: kafka.PartitionAny},
 				Value:          secretByteArr[1],
-				Key:            []byte(strconv.Itoa(2)),
+				Key:            keyBytes,
 			},
 			EOF: false,
 		}
@@ -103,7 +107,7 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.Topic, Partition: kafka.PartitionAny},
 				Value:          secretByteArr[2],
-				Key:            []byte(strconv.Itoa(3)),
+				Key:            keyBytes,
 			},
 			EOF: false,
 		}
@@ -119,30 +123,6 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 
 func createDataShares(metrics map[string]interface{}) [][]byte {
 	fmt.Printf("metrics: %v\n", metrics)
-	/*
-		mapArr := make([]map[string][]byte, 3)
-		mapArr[0] = make(map[string][]byte)
-		mapArr[1] = make(map[string][]byte)
-		mapArr[2] = make(map[string][]byte)
-		for key, val := range metrics {
-			valBytes, _ := GetBytes(val)
-			valByteArr := generateRandomIntShares(valBytes)
-			mapArr[0][key] = valByteArr[0]
-			mapArr[1][key] = valByteArr[1]
-			mapArr[2][key] = valByteArr[2]
-		}
-		fmt.Printf("mapArr[0]: %v\n", mapArr[0])
-		var bytesArr [][]byte
-		for _, valMap := range mapArr {
-			fmt.Printf("valMap: %v\n", valMap)
-			jsonBytes, err := json.Marshal(&valMap)
-			fmt.Printf("unmarshalled json bytes: %v\n", string(jsonBytes))
-			if err != nil {
-				log.Println("Problem in preprocessor: fail to serialize values in createDataShares")
-			}
-			bytesArr = append(bytesArr, jsonBytes)
-		}
-	*/
 	valBytes, _ := GetBytes(metrics["value"])
 	valByteArr := generateRandomIntShares(valBytes)
 	return valByteArr

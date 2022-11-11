@@ -44,6 +44,7 @@ func (parser *LogParser) Run() {
 						EOF:   false,
 						Val:   parsedMap,
 						Topic: parser.config.ParserConfig.Topic,
+						Key:   log.Key,
 					}
 				} else {
 					fmt.Println(err)

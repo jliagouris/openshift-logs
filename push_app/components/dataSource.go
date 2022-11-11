@@ -32,6 +32,7 @@ type PrometheusMetric struct {
 		Service    string
 	}
 	Values int
+	Key    DataShareKey
 	EOF    bool
 }
 
@@ -66,6 +67,8 @@ func (ps PrometheusDataSource) Run() error {
 	respJson := Response.PrometheusResponse{}
 	ps.ParseResponse(body, &respJson)
 	for _, result := range respJson.Data.Result {
+		var seqNum uint32
+		seqNum = 0
 		valueStr := fmt.Sprintf("%v", result.Values[1])
 		value, err := strconv.Atoi(valueStr)
 		if err != nil {
@@ -83,7 +86,13 @@ func (ps PrometheusDataSource) Run() error {
 				Service    string
 			}(result.Metric),
 			Values: value,
+			Key: DataShareKey{
+				ClientId: ps.Conf.ClientId,
+				QueryId:  0,
+				SeqNum:   seqNum,
+			},
 		}
+		seqNum++
 	}
 	ps.RawDataChan <- PrometheusMetric{EOF: true}
 	return nil
@@ -117,6 +126,7 @@ func MakePrometheusDataSource(opConfig configs.OperatorConf) *PrometheusDataSour
 	ps.RawDataChan = make(chan PrometheusMetric, opConfig.ChanBufSize)
 	promConf := &configs.PrometheusConf{}
 	promConf.LoadConfig()
+	promConf.ClientId = opConfig.ClientId
 	ps.Conf = promConf
 	return &ps
 }
