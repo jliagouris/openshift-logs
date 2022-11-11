@@ -24,34 +24,61 @@ func MakeParser(chanBufSize int, inLogChan chan PrometheusMetric, config LogConf
 
 // Main goroutine for LogParser, checks for incoming log from InLogChan and parses it.
 func (parser *LogParser) Run() {
-	exit := false
-	for !exit {
-		select {
-		case log := <-parser.InLogChan:
-			fmt.Printf("parser data: %v\n", log)
-			if log.EOF {
-				fmt.Println("Parser EOF")
-				parser.ParsedChan <- Log{
-					EOF: true,
-				}
-				exit = true
-			} else {
-				parsedMap, err := parser.ParseLog(log)
+	for log := range parser.InLogChan {
+		fmt.Printf("parser data: %v\n", log)
+		if log.EOF {
+			fmt.Println("Parser EOF")
+			parser.ParsedChan <- Log{
+				EOF: true,
+			}
+			//exit = true
+		} else {
+			parsedMap, err := parser.ParseLog(log)
 
-				if err == nil {
-					//log.Val = processedLog
-					parser.ParsedChan <- Log{
-						EOF:   false,
-						Val:   parsedMap,
-						Topic: parser.config.ParserConfig.Topic,
-						Key:   log.Key,
-					}
-				} else {
-					fmt.Println(err)
+			if err == nil {
+				//log.Val = processedLog
+				parser.ParsedChan <- Log{
+					EOF:   false,
+					Val:   parsedMap,
+					Topic: parser.config.ParserConfig.Topic,
+					Key:   log.Key,
 				}
+			} else {
+				fmt.Println(err)
 			}
 		}
 	}
+	/*
+		exit := false
+		for !exit {
+			select {
+			case log := <-parser.InLogChan:
+				fmt.Printf("parser data: %v\n", log)
+				if log.EOF {
+					fmt.Println("Parser EOF")
+					parser.ParsedChan <- Log{
+						EOF: true,
+					}
+					exit = true
+				} else {
+					parsedMap, err := parser.ParseLog(log)
+
+					if err == nil {
+						//log.Val = processedLog
+						parser.ParsedChan <- Log{
+							EOF:   false,
+							Val:   parsedMap,
+							Topic: parser.config.ParserConfig.Topic,
+							Key:   log.Key,
+						}
+					} else {
+						fmt.Println(err)
+					}
+				}
+			}
+		}
+
+	*/
 }
 
 // ParseLog takes a log and matches the schema of the log with config	and returns the processed log.

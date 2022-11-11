@@ -12,6 +12,7 @@ type PrometheusConf struct {
 	Query     string `yaml:"query"`
 	NumWorker int    `yaml:"numWorker"`
 	ClientId  string
+	Interval  string
 }
 
 func (ps *PrometheusConf) LoadConfig() error {
