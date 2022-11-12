@@ -2,12 +2,13 @@ package components
 
 import (
 	"bytes"
-	"crypto/rand"
 	"encoding/binary"
 	"encoding/gob"
-	"encoding/json"
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"math/rand"
+	"strconv"
+	"time"
 )
 
 // Preprocesses logs queried by parser
@@ -75,43 +76,43 @@ func (p *Preprocessor) dispatchDataShareLoop() {
 // Generate Data shares from log
 func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 	if !log.EOF {
-		secretByteArr := createDataShares(log.Val)
+		secretStrArr := createDataShares(log.Val)
 		//var map1 map[string]interface{}
-		//json.Unmarshal(secretByteArr[0], &map1)
-		keyBytes, err := json.Marshal(log.Key)
-		if err != nil {
-			fmt.Println("error in log 2 datashares getting key byte array:", err)
-		}
-		fmt.Printf("Generated key: %v\n", string(keyBytes))
-		fmt.Printf("map1: %v\n", binary.BigEndian.Uint64(secretByteArr[0]))
-		share1 := DataShare{
+		//json.Unmarshal(secretStrArr[0], &map1)
+		keyStringArr := getKeyString(log.Key)
+		fmt.Printf("Generated key: %v\n", string(keyStringArr))
+		//fmt.Printf("map1: %v\n", binary.BigEndian.Uint64(secretStrArr[0]))
+		val0 := keyStringArr + " " + "0" + " " + secretStrArr[0]
+		share0 := DataShare{
 			ProducerIdArr: []int{1, 2},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.Topic, Partition: kafka.PartitionAny},
-				Value:          secretByteArr[0],
-				Key:            keyBytes,
+				Value:          []byte(val0),
+				Key:            []byte("0"),
 			},
 			EOF: false,
 		}
-		share2 := DataShare{
+		val1 := keyStringArr + " " + "1" + " " + secretStrArr[1]
+		share1 := DataShare{
 			ProducerIdArr: []int{0, 2},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.Topic, Partition: kafka.PartitionAny},
-				Value:          secretByteArr[1],
-				Key:            keyBytes,
+				Value:          []byte(val1),
+				Key:            []byte("1"),
 			},
 			EOF: false,
 		}
-		share3 := DataShare{
+		val2 := keyStringArr + " " + "2" + " " + secretStrArr[2]
+		share2 := DataShare{
 			ProducerIdArr: []int{0, 1},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.Topic, Partition: kafka.PartitionAny},
-				Value:          secretByteArr[2],
-				Key:            keyBytes,
+				Value:          []byte(val2),
+				Key:            []byte("2"),
 			},
 			EOF: false,
 		}
-		return []DataShare{share1, share2, share3}
+		return []DataShare{share0, share1, share2}
 	} else {
 		share := DataShare{
 			ProducerIdArr: []int{0, 1, 2},
@@ -121,11 +122,22 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 	}
 }
 
-func createDataShares(metrics map[string]interface{}) [][]byte {
+func getKeyString(key DataShareKey) string {
+	str := ""
+	str += key.ClientId + " " + strconv.Itoa(int(key.QueryId)) + " " + strconv.Itoa(int(key.SeqNum))
+	return str
+}
+
+func createDataShares(metrics map[string]interface{}) []string {
 	fmt.Printf("metrics: %v\n", metrics)
-	valBytes, _ := GetBytes(metrics["value"])
-	valByteArr := generateRandomIntShares(valBytes)
-	return valByteArr
+	//valBytes, _ := GetBytes(metrics["value"])
+	//valByteArr := generateRandomIntShares(valBytes)
+	shareArr := make([]string, 3)
+	shareIntArr := generateRandomIntShares(metrics["value"].(int))
+	for idx, num := range shareIntArr {
+		shareArr[idx] = strconv.Itoa(num)
+	}
+	return shareArr
 }
 
 func GetBytes(key interface{}) ([]byte, error) {
@@ -166,6 +178,7 @@ func generateRandomBooleanShares(log Log) [][]byte {
 	return shares
 }
 */
+/*
 func generateRandomIntShares(intBytes []byte) [][]byte {
 	//data1 := binary.BigEndian.Uint64(intBytes)
 	//fmt.Printf("int bytes: %v\n", intBytes)
@@ -187,6 +200,21 @@ func generateRandomIntShares(intBytes []byte) [][]byte {
 	share1 := binary.BigEndian.Uint64(shares[1])
 	//fmt.Printf("share1: %v\n", share1)
 	binary.BigEndian.PutUint64(shares[2], data-(share0+share1))
+	//fmt.Printf("share2 int: %v\n", data-(share0+share1))
+	//fmt.Printf("share2: %v\n", binary.BigEndian.Uint64(shares[2]))
+	//fmt.Printf("sum data: %v\n", share0+share1+binary.BigEndian.Uint64(shares[2]))
+	return shares
+}
+*/
+
+func generateRandomIntShares(num int) []int {
+	//data1 := binary.BigEndian.Uint64(intBytes)
+	//fmt.Printf("int bytes: %v\n", intBytes)
+	shares := make([]int, 3)
+	rand.Seed(time.Now().UnixNano())
+	shares[0] = rand.Int()
+	shares[1] = rand.Int()
+	shares[2] = num - shares[1] - shares[0]
 	//fmt.Printf("share2 int: %v\n", data-(share0+share1))
 	//fmt.Printf("share2: %v\n", binary.BigEndian.Uint64(shares[2]))
 	//fmt.Printf("sum data: %v\n", share0+share1+binary.BigEndian.Uint64(shares[2]))
