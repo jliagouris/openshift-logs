@@ -71,11 +71,13 @@ func (ps PrometheusDataSource) Run() error {
 
 		respJson := Response.PrometheusResponse{}
 		ps.ParseResponse(body, &respJson)
+		var seqNum uint32
+		seqNum = 0
 		for _, result := range respJson.Data.Result {
-			var seqNum uint32
-			seqNum = 0
+			fmt.Printf("Query Result: %v\n", result)
 			valueStr := fmt.Sprintf("%v", result.Values[1])
-			value, err := strconv.Atoi(valueStr)
+			valueFloat, err := strconv.ParseFloat(valueStr, 32)
+			value := int(valueFloat * 1000)
 			if err != nil {
 				log.Printf("Error turing value to int in prometheus datasource.Run()")
 				return err

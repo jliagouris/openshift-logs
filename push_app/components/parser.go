@@ -96,6 +96,7 @@ func (parser *LogParser) ParseLog(log PrometheusMetric) (map[string]interface{},
 	data, _ := json.Marshal(log.Metric)
 	json.Unmarshal(data, &rawMetrics)
 	rawMetrics["value"] = log.Values
+	rawMetrics["Container"] = getContainerIdxMap()[log.Metric.Container]
 	fmt.Printf("parse log rawMetrics: %v\n", rawMetrics)
 	processedLog := make(map[string]interface{})
 	fmt.Printf("parse log processedlog: %v\n", processedLog)
@@ -122,7 +123,7 @@ func (parser *LogParser) ParseLog(log PrometheusMetric) (map[string]interface{},
 			return nil, err
 		}
 	*/
-
+	fmt.Printf("parsed log: %v\n", processedLog)
 	return processedLog, nil
 }
 
