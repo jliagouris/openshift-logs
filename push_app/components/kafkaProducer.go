@@ -36,7 +36,7 @@ func (p *KafkaProducer) ProduceLoop(wg *sync.WaitGroup) {
 	// Produce all msgs sent to the channel until receive a close msg
 	for dataShare := range p.MsgChan {
 		if dataShare.EOF {
-			fmt.Println("Producer EOF")
+			//fmt.Println("Producer EOF")
 			//break
 			p.flush()
 			continue
@@ -81,7 +81,7 @@ func (p *KafkaProducer) Close() {
 
 // MakeKafkaProducer Creates producer object
 func MakeKafkaProducer(configMap *kafka.ConfigMap, msgChan chan DataShare, timeout int) *KafkaProducer {
-	fmt.Printf("producer channel buffer size: %v\n", cap(msgChan))
+	//fmt.Printf("producer channel buffer size: %v\n", cap(msgChan))
 
 	p, err := kafka.NewProducer(configMap)
 

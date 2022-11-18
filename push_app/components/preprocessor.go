@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
-	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"math/rand"
 	"strconv"
@@ -44,7 +43,7 @@ func (p *Preprocessor) PreprocessLoop() {
 	go p.dispatchDataShareLoop()
 	for log := range p.ParsedChan {
 		logCnt++
-		fmt.Printf("logCnt: %v\n", logCnt)
+		//fmt.Printf("logCnt: %v\n", logCnt)
 		dataShares := p.log2DataShares(log)
 
 		// Send data shares to the channel
@@ -61,7 +60,7 @@ func (p *Preprocessor) dispatchDataShareLoop() {
 		//fmt.Printf("Datashare cnt: %v\n", dataShareCnt)
 		//fmt.Printf("datashare content: %v\n", dataShare)
 		if dataShare.EOF {
-			fmt.Println("Preprocessor EOF")
+			//fmt.Println("Preprocessor EOF")
 			for _, producer := range p.producers {
 				producer.MsgChan <- dataShare
 			}
@@ -79,12 +78,12 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 		secretStrArr := createDataShares(log.Val)
 		//var map1 map[string]interface{}
 		//json.Unmarshal(secretStrArr[0], &map1)
-		keyStringArr := getKeyString(log.Key)
-		fmt.Printf("Generated key: %v\n", string(keyStringArr))
+		keyString := getKeyString(log.Key)
+		//fmt.Printf("Generated key: %v\n", keyString)
 		//fmt.Printf("map1: %v\n", binary.BigEndian.Uint64(secretStrArr[0]))
-		val0 := keyStringArr + " " + "0" + " " + secretStrArr[0]
+		val0 := keyString + " " + "0" + " " + secretStrArr[0]
 		share0 := DataShare{
-			ProducerIdArr: []int{1, 2},
+			ProducerIdArr: []int{0},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.Topic, Partition: kafka.PartitionAny},
 				Value:          []byte(val0),
@@ -92,9 +91,9 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 			},
 			EOF: false,
 		}
-		val1 := keyStringArr + " " + "1" + " " + secretStrArr[1]
+		val1 := keyString + " " + "1" + " " + secretStrArr[1]
 		share1 := DataShare{
-			ProducerIdArr: []int{0, 2},
+			ProducerIdArr: []int{1},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.Topic, Partition: kafka.PartitionAny},
 				Value:          []byte(val1),
@@ -102,9 +101,9 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 			},
 			EOF: false,
 		}
-		val2 := keyStringArr + " " + "2" + " " + secretStrArr[2]
+		val2 := keyString + " " + "2" + " " + secretStrArr[2]
 		share2 := DataShare{
-			ProducerIdArr: []int{0, 1},
+			ProducerIdArr: []int{2},
 			Message: kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &log.Topic, Partition: kafka.PartitionAny},
 				Value:          []byte(val2),
@@ -129,7 +128,7 @@ func getKeyString(key DataShareKey) string {
 }
 
 func createDataShares(metrics map[string]interface{}) []string {
-	fmt.Printf("metrics: %v\n", metrics)
+	//fmt.Printf("metrics: %v\n", metrics)
 	//valBytes, _ := GetBytes(metrics["value"])
 	//valByteArr := generateRandomIntShares(valBytes)
 	shareArr := make([]string, 3)
