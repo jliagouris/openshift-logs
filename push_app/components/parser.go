@@ -18,7 +18,7 @@ type LogParser struct {
 func MakeParser(chanBufSize int, inLogChan chan PrometheusMetric, config LogConfig) *LogParser {
 	//TODO: This will change
 	parser := LogParser{ParsedChan: make(chan Log, chanBufSize), InLogChan: inLogChan, config: config}
-	fmt.Printf("parser channel buffer size: %v\n", cap(parser.ParsedChan))
+	//fmt.Printf("parser channel buffer size: %v\n", cap(parser.ParsedChan))
 	return &parser
 }
 
@@ -26,9 +26,9 @@ func MakeParser(chanBufSize int, inLogChan chan PrometheusMetric, config LogConf
 func (parser *LogParser) Run() {
 	//TODO: PARSER EXITED HERE
 	for log := range parser.InLogChan {
-		fmt.Printf("parser data: %v\n", log)
+		//fmt.Printf("parser data: %v\n", log)
 		if log.EOF {
-			fmt.Println("Parser EOF")
+			//fmt.Println("Parser EOF")
 			parser.ParsedChan <- Log{
 				EOF: true,
 			}
@@ -91,16 +91,16 @@ func (parser *LogParser) ParseLog(log PrometheusMetric) (map[string]interface{},
 			return nil, err
 		}
 	*/
-	fmt.Printf("parse log PrometheusMetric: %v\n", log)
+	//fmt.Printf("parse log PrometheusMetric: %v\n", log)
 	var rawMetrics map[string]interface{}
 	data, _ := json.Marshal(log.Metric)
 	json.Unmarshal(data, &rawMetrics)
 	rawMetrics["value"] = log.Values
 	rawMetrics["Container"] = getContainerIdxMap()[log.Metric.Container]
-	fmt.Printf("parse log rawMetrics: %v\n", rawMetrics)
+	//fmt.Printf("parse log rawMetrics: %v\n", rawMetrics)
 	processedLog := make(map[string]interface{})
-	fmt.Printf("parse log processedlog: %v\n", processedLog)
-	fmt.Printf("parse log logschema: %v\n", parser.config.ParserConfig.LogSchema)
+	//fmt.Printf("parse log processedlog: %v\n", processedLog)
+	//fmt.Printf("parse log logschema: %v\n", parser.config.ParserConfig.LogSchema)
 	for _, key := range log.Keys {
 		if val, ok := rawMetrics[key]; ok {
 			processedLog[key] = val
@@ -123,7 +123,7 @@ func (parser *LogParser) ParseLog(log PrometheusMetric) (map[string]interface{},
 			return nil, err
 		}
 	*/
-	fmt.Printf("parsed log: %v\n", processedLog)
+	//fmt.Printf("parsed log: %v\n", processedLog)
 	return processedLog, nil
 }
 

@@ -43,6 +43,7 @@ func (ps PrometheusDataSource) Run() error {
 	var queryId uint32
 	queryId = 0
 	for query := range ps.QueryChan {
+		fmt.Println("--------------------------------------------- In coming query")
 		params := url.Values{}
 		params.Add("query", query.Query)
 		//queryUrl := "https://" + ps.Conf.Route + "/api/v1/query?" + params.Encode()

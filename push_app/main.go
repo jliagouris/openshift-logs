@@ -3,7 +3,6 @@ package main
 // Main file of log pushing adHocOperator
 
 import (
-	"fmt"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"log"
@@ -28,7 +27,7 @@ type adHocOperator struct {
 func main() {
 	PRODUCER_TMO = 15 * 1000 // This is an arbitrarily chosen timeout
 	conf := getConfig()
-	fmt.Printf("global conf: %v\n", conf.OpConf)
+	//fmt.Printf("global conf: %v\n", conf.OpConf)
 	pushOperator := makeOperator(conf, PRODUCER_TMO)
 	pushOperator.run()
 }
@@ -36,7 +35,7 @@ func main() {
 // Create adHocOperator object
 func makeOperator(conf Config, producerTimeout int) *adHocOperator {
 	clusterConfList := conf.KafkaConf.ToClusterConfList()
-	fmt.Printf("Generated %v configs\n", clusterConfList)
+	//fmt.Printf("Generated %v configs\n", clusterConfList)
 	ahOperator := adHocOperator{producers: make([]*components.KafkaProducer, len(clusterConfList))}
 	for idx, clusterConf := range clusterConfList {
 		msgChan := make(chan components.DataShare, conf.OpConf.ChanBufSize)
@@ -110,7 +109,7 @@ func getKafkaConfig(yamlFile []byte) configs.KafkaClientConf {
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)
 	}
-	fmt.Printf("clusters conf: %v\n", clustersConf.Confs)
+	//fmt.Printf("clusters conf: %v\n", clustersConf.Confs)
 	return clustersConf
 }
 

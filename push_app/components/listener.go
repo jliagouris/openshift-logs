@@ -3,7 +3,6 @@ package components
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -26,17 +25,17 @@ type AdHocQuery struct {
 }
 
 func (l *AdHocListener) handler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Received %v request for %s\n", r.Method)
+	//log.Printf("Received %v request for %s\n", r.Method)
 	decoder := json.NewDecoder(r.Body)
 	var t AdHocQuery
 	err := decoder.Decode(&t)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("decoded query: %v\n", t)
+	//fmt.Printf("decoded query: %v\n", t)
 	//go func() { l.QueryChan <- t }()
 	l.QueryChan <- t
-	fmt.Println("handler finished")
+	//fmt.Println("handler finished")
 	/*
 		// Send req using http Client
 		client := &http.Client{}
