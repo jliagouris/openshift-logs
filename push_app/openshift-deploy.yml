@@ -15,7 +15,8 @@ spec:
     spec:                        # Spec for the container which will run in the Pod
       containers:
         - name: adhoc-app
-          image: jingyusu/adhoc-app:1.0.0
+          #image: jingyusu/adhoc-app-0:demo
+          image: jingyusu/adhoc-app-1:demo
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8083

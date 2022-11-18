@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
-	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"math/rand"
 	"strconv"
@@ -44,7 +43,7 @@ func (p *Preprocessor) PreprocessLoop() {
 	go p.dispatchDataShareLoop()
 	for log := range p.ParsedChan {
 		logCnt++
-		fmt.Printf("logCnt: %v\n", logCnt)
+		//fmt.Printf("logCnt: %v\n", logCnt)
 		dataShares := p.log2DataShares(log)
 
 		// Send data shares to the channel
@@ -61,7 +60,7 @@ func (p *Preprocessor) dispatchDataShareLoop() {
 		//fmt.Printf("Datashare cnt: %v\n", dataShareCnt)
 		//fmt.Printf("datashare content: %v\n", dataShare)
 		if dataShare.EOF {
-			fmt.Println("Preprocessor EOF")
+			//fmt.Println("Preprocessor EOF")
 			for _, producer := range p.producers {
 				producer.MsgChan <- dataShare
 			}
@@ -85,7 +84,7 @@ func (p *Preprocessor) log2DataShares(log Log) []DataShare {
 		//if err != nil {
 		//	fmt.Println("error in log 2 datashares getting key byte array:", err)
 		//}
-		fmt.Printf("Generated key: %v\n", keyString)
+		//fmt.Printf("Generated key: %v\n", keyString)
 		//fmt.Printf("map1: %v\n", binary.BigEndian.Uint64(secretByteArr[0]))
 		val0 := keyString + " " + "0" + " " + secretStrArr[0]
 		share1 := DataShare{
@@ -143,7 +142,7 @@ func createDataShares(metrics map[string]interface{}) [][]byte {
 */
 
 func createDataShares(metrics map[string]interface{}) []string {
-	fmt.Printf("metrics: %v\n", metrics)
+	//fmt.Printf("metrics: %v\n", metrics)
 	//valBytes, _ := GetBytes(metrics["value"])
 	//valByteArr := generateRandomIntShares(valBytes)
 	shareArr := make([]string, 3)
