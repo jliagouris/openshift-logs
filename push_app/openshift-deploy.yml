@@ -2,18 +2,19 @@
 apiVersion: apps/v1
 kind: Deployment                 # Type of Kubernetes resource
 metadata:
-  name: prometheus-app           # Name of the Kubernetes resource
+  name: push-app           # Name of the Kubernetes resource
 spec:
   replicas: 1                    # Number of pods to run at any given time
   selector:
     matchLabels:
-      app: prometheus-app        # This deployment applies to any Pods matching the specified label
+      app: push-app        # This deployment applies to any Pods matching the specified label
   template:                      # This deployment will create a set of pods using the configurations in this template
     metadata:
       labels:                    # The labels that will be applied to all of the pods in this deployment
-        app: prometheus-app
+        app: push-app
     spec:                        # Spec for the container which will run in the Pod
       containers:
-        - name: prometheus-app
-          image: jingyusu/prometheus-app:1.0.1
+        - name: push-app
+          image: jingyusu/push_app-0:demo
+          #image: jingyusu/push_app-1:demo
           imagePullPolicy: IfNotPresent

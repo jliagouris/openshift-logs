@@ -1,72 +1,47 @@
 ---
 parallelism: 1
-chan_buf_size: 10
-push: 1
-pull: 0
-push_period: "1d"
+chan_buf_size: 8
+time_interval: "15s"
+client_id: 1
 
 Clusters:
   cluster_0:
-    bootstrap.servers: "pkc-epwny.eastus.azure.confluent.cloud:9092"
-    security.protocol: "SASL_SSL"
-    sasl.mechanisms: "PLAIN"
-    sasl.username: "XNZGLNHSXLMDUZ44"
-    sasl.password: "BBmFBIhcJboGXkMaNznYPFWSoF8T+yd+KJ/JBeO4f/wLFK5tWRmyTBG/bbJTSqL/"
+    # Required connection configs for Kafka producer, consumer, and admin
+    bootstrap.servers: pkc-ymrq7.us-east-2.aws.confluent.cloud:9092
+    security.protocol: SASL_SSL
+    sasl.mechanisms: PLAIN
+    sasl.username: ZQRTDWRJKCGGMW7Q
+    sasl.password: XN45jOMZV6yKD2dlhuKD3vX5OQnjhGbAcn21qToyHX9j3Khoyp1MUK4xj8rdqiaW
 
     # Best practice for higher availability in librdkafka clients prior to 1.7
-    session.timeout.ms: "45000"
+    session.timeout.ms: 45000
 
   cluster_1:
-    bootstrap.servers: "pkc-6ojv2.us-west4.gcp.confluent.cloud:9092"
-    security.protocol: "SASL_SSL"
-    sasl.mechanisms: "PLAIN"
-    sasl.username: "7ZBWWEMZBBDAIJNU"
-    sasl.password: "yCZR0cchS9xJz8FYfpXoEv3wJUl1gmwck4z6N1Pv/LFGFeW0F01O1t5b8Qpz+2bb"
+
+    # Required connection configs for Kafka producer, consumer, and admin
+    bootstrap.servers: pkc-lzvrd.us-west4.gcp.confluent.cloud:9092
+    security.protocol: SASL_SSL
+    sasl.mechanisms: PLAIN
+    sasl.username: N6DNYDWUTZV266WU
+    sasl.password: bZi80jaUoES4w04p2fq/eDOVvU8xQ1MCRQvcGcz2cUydz+zU507pRwyrRkUkSN5E
 
     # Best practice for higher availability in librdkafka clients prior to 1.7
-    session.timeout.ms: "45000"
+    session.timeout.ms: 45000
 
   cluster_2:
-    bootstrap.servers: "pkc-ymrq7.us-east-2.aws.confluent.cloud:9092"
-    security.protocol: "SASL_SSL"
-    sasl.mechanisms: "PLAIN"
-    sasl.username: "TYY4DXJVBSUX5C2R"
-    sasl.password: "vtwnf8AinhCkpA1layKDVM5RRVsG4ddK6HaquJFucQ/vN13rZhipiRE0U62XJWye"
+    # Required connection configs for Kafka producer, consumer, and admin
+    bootstrap.servers: pkc-56d1g.eastus.azure.confluent.cloud:9092
+    security.protocol: SASL_SSL
+    sasl.mechanisms: PLAIN
+    sasl.username: MZYOWFIYCONX55OF
+    sasl.password: 3meaCUzwMtZQLgLcSxEspLZ7qzmLS76VV7oH9mVa/colplqXceqSd2DXquho9DdM
 
     # Best practice for higher availability in librdkafka clients prior to 1.7
-    session.timeout.ms: "45000"
+    session.timeout.ms: 45000
+
 
 parserConfig:
-  authToken: "Bearer sha256~fy4L4AdnL9TK5ckhkJfk4jUbwIWxW5jIak2op2TDC8s"
-  xScopeOrgID: cluster-infra-logs
-  query: "%7Bcluster_log_level=%22infra-logs%22,%20openshift_cluster=%22moc/smaug%22%7D"
-  start: 1655402179
-  end: 1656093379
-  limit: 5000
+  topic: "periodic"
   logSchema:
-    - key: cluster_log_level
-      nullable: true
-    - key: docker_container_id
-      nullable: true
-    - key: k8s_namespace_name
-      nullable: true
-    - key: kubernetes_container_image_id
-      nullable: true
-    - key: kubernetes_container_name
-      nullable: true
-    - key: kubernetes_host
-      nullable: true
-    - key: kubernetes_labels_app
-      nullable: true
-    - key: kubernetes_labels_pod_template_hash
-      nullable: true
-    - key: kubernetes_master_url
-      nullable: true
-    - key: kubernetes_namespace_labels_kubernetes_io_metadata_name
-      nullable: true
-    - key: kubernetes_namespace_labels_openshift_io_cluster_monitoring
-      nullable: true
-    - key: message
-      nullable: false
-    - key: ts
+    - key: "value"
       nullable: true
