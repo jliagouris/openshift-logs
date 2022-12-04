@@ -3,12 +3,13 @@ package main
 // Main file of log pushing operator
 
 import (
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"log"
 	"push_app/components"
 	"push_app/configs"
 	"sync"
+
+	"gopkg.in/yaml.v3"
 )
 
 // PRODUCER_TMO is the timeout for producers
@@ -26,7 +27,6 @@ type operator struct {
 func main() {
 	PRODUCER_TMO = 15 * 1000 // This is an arbitrarily chosen timeout
 	conf := getConfig()
-	//fmt.Printf("global conf: %v\n", conf.OpConf)
 	pushOperator := makePushOperator(conf, PRODUCER_TMO)
 	pushOperator.run()
 }
@@ -34,7 +34,6 @@ func main() {
 // Create operator object
 func makePushOperator(conf Config, producerTimeout int) *operator {
 	clusterConfList := conf.KafkaConf.ToClusterConfList()
-	//fmt.Printf("Generated %v configs\n", clusterConfList)
 	pushOperator := operator{producers: make([]*components.KafkaProducer, len(clusterConfList))}
 	for idx, clusterConf := range clusterConfList {
 		msgChan := make(chan components.DataShare, conf.OpConf.ChanBufSize)
@@ -46,11 +45,7 @@ func makePushOperator(conf Config, producerTimeout int) *operator {
 	if err != nil {
 		panic(err)
 	}
-	//pushOperator.dataSource = components.MakeLokiDataSource(config)
-	//datasource := components.MakeDataSource(conf.OpConf)
 	pushOperator.dataSource = components.MakePrometheusDataSource(conf.OpConf)
-	//fmt.Println("Datasource conf: ******************")
-	//fmt.Printf("%v\n", *pushOperator.dataSource.Conf)
 	pushOperator.parser = components.MakeParser(conf.OpConf.ChanBufSize, pushOperator.dataSource.GetDataChan(), config) // TODO: This will change
 	DataShareChan := make(chan components.DataShare, conf.OpConf.ChanBufSize)
 	pushOperator.preprocessor = components.MakePreprocessor(len(clusterConfList), pushOperator.parser.ParsedChan, DataShareChan, pushOperator.producers)
@@ -104,7 +99,6 @@ func getKafkaConfig(yamlFile []byte) configs.KafkaClientConf {
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)
 	}
-	//fmt.Printf("clusters conf: %v\n", clustersConf.Confs)
 	return clustersConf
 }
 

@@ -2,8 +2,7 @@ package components
 
 // Log Parsed log
 type Log struct {
-	EOF bool
-	//TODO: Fill this
+	EOF   bool
 	Val   map[string]interface{}
 	Topic string
 	Key   DataShareKey

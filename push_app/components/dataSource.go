@@ -38,7 +38,6 @@ type PrometheusMetric struct {
 }
 
 func (ps PrometheusDataSource) Run() error {
-	//fmt.Printf("Query is: %v\n", ps.Conf.Query)
 	params := url.Values{}
 	params.Add("query", ps.Conf.Query)
 	queryUrl := "https://" + ps.Conf.Route + "/api/v1/query?" + params.Encode()
@@ -78,7 +77,6 @@ func (ps PrometheusDataSource) Run() error {
 			log.Println("Error while reading the response bytes:", err)
 			return err
 		}
-		//fmt.Printf("promql body: %v\n", string(body))
 		respJson := Response.PrometheusResponse{}
 		ps.ParseResponse(body, &respJson)
 		for _, result := range respJson.Data.Result {
@@ -123,22 +121,11 @@ func (ps PrometheusDataSource) ParseResponse(body []byte, promResp *Response.Pro
 		log.Println("JSON Error in Parse Response:", err)
 		return
 	}
-	//log.Println("JSON Response:", string(body))
 }
 
 func (ps PrometheusDataSource) GetDataChan() chan PrometheusMetric {
 	return ps.RawDataChan
 }
-
-/*
-func MakeDataSource(opConfig configs.OperatorConf) DataSource {
-	if strings.EqualFold(opConfig.DataSourceType, PROMETHEUS) {
-		return MakePrometheusDataSource(opConfig)
-	}
-	log.Println("UNKNOWN DATA SOURCE!")
-	return nil
-}
-*/
 
 func MakePrometheusDataSource(opConfig configs.OperatorConf) *PrometheusDataSource {
 	ps := PrometheusDataSource{}

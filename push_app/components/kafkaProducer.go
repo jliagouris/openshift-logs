@@ -2,17 +2,17 @@ package components
 
 import (
 	"fmt"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"os"
 	"sync"
+
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 // KafkaProducer Producer that sends queried and preprocessed logs to Kafka broker
 type KafkaProducer struct {
 	producer *kafka.Producer // producer in confluent_kafka_go
-	//TODO: Buffered channels for better performance? Maybe?
-	MsgChan chan DataShare // Get asynchronously generated messages through this channel
-	timeout int            // Producer timeout
+	MsgChan  chan DataShare  // Get asynchronously generated messages through this channel
+	timeout  int             // Producer timeout
 }
 
 // ProduceLoop Goroutine that loops to push messages to Secrecy kafka broker
@@ -36,8 +36,6 @@ func (p *KafkaProducer) ProduceLoop(wg *sync.WaitGroup) {
 	// Produce all msgs sent to the channel until receive a close msg
 	for dataShare := range p.MsgChan {
 		if dataShare.EOF {
-			//fmt.Println("Producer EOF")
-			//break
 			p.flush()
 			continue
 		}
@@ -51,7 +49,6 @@ func (p *KafkaProducer) ProduceLoop(wg *sync.WaitGroup) {
 
 // Wrapper of confluent_kafka produce method
 func (p *KafkaProducer) produce(msg *kafka.Message) {
-	//TODO: Do we need a delivery channel?
 	err := p.producer.Produce(msg, nil)
 	if err != nil {
 		fmt.Printf("An message failed to be sent\n")
@@ -65,7 +62,6 @@ func (p *KafkaProducer) events() chan kafka.Event {
 
 // flush Wrapper of confluent_kafka flush() method, waits until all messages are acked or timeout
 func (p *KafkaProducer) flush() {
-	//TODO: What do we do if some messages fail?
 	unsuccessfulMsgCnt := p.producer.Flush(p.timeout)
 	if unsuccessfulMsgCnt > 0 {
 		fmt.Printf("%v messages failed to be delievered\n", unsuccessfulMsgCnt)
@@ -81,8 +77,6 @@ func (p *KafkaProducer) Close() {
 
 // MakeKafkaProducer Creates producer object
 func MakeKafkaProducer(configMap *kafka.ConfigMap, msgChan chan DataShare, timeout int) *KafkaProducer {
-	//fmt.Printf("producer channel buffer size: %v\n", cap(msgChan))
-
 	p, err := kafka.NewProducer(configMap)
 
 	if err != nil {
