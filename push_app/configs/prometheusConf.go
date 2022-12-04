@@ -2,8 +2,9 @@ package configs
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v3"
 )
 
 type PrometheusConf struct {
@@ -20,7 +21,6 @@ func (ps *PrometheusConf) LoadConfig() error {
 		fmt.Printf("Error reading prom config%v\n", err)
 		return err
 	} else {
-		//fmt.Printf("data: _____________________%v\n", data)
 		if err := yaml.Unmarshal(data, &ps); err != nil {
 			return err
 		}

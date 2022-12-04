@@ -16,7 +16,5 @@ func (c *KafkaClientConf) ToClusterConfList() []kafka.ConfigMap {
 		configSlice[idx] = conf
 		idx++
 	}
-	//fmt.Printf("Generated %v configs\n", configSlice)
-	//fmt.Printf("Generated %v configs\n", len(configSlice))
 	return configSlice
 }
