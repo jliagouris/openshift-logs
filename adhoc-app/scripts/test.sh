@@ -1,0 +1,1 @@
+curl -ks -H 'Authorization: Bearer sha256~J5j8KRXs_pHAuD33AewiMHsy0ETcssl4tSBhzklyng0' 'https://prometheus-k8s-openshift-monitoring.apps.log-analysis.x6yq.p1.openshiftapps.com/api/v1/query?query=http_requests_total%7Bcode%3D"200"%2Cmethod%3D"get"%7D' >> query_result.json

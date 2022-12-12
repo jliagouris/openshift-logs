@@ -1,0 +1,1 @@
+oc -n openshift-monitoring get routes | grep prometheus-k8s-openshift-monitoring | awk '{print $2}'

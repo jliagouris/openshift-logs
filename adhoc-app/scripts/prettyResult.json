@@ -1,0 +1,160 @@
+{
+    "status": "success",
+    "data": {
+        "resultType": "vector",
+        "result": [
+            {
+                "metric": {
+                    "__name__": "http_requests_total",
+                    "code": "200",
+                    "container": "kube-rbac-proxy-metrics",
+                    "endpoint": "metrics",
+                    "handler": "label_values",
+                    "instance": "10.128.10.23:9094",
+                    "job": "thanos-querier",
+                    "method": "get",
+                    "namespace": "openshift-monitoring",
+                    "pod": "thanos-querier-9c8597888-j2n5c",
+                    "service": "thanos-querier"
+                },
+                "value": [
+                    1664939722.46,
+                    "8"
+                ]
+            },
+            {
+                "metric": {
+                    "__name__": "http_requests_total",
+                    "code": "200",
+                    "container": "kube-rbac-proxy-metrics",
+                    "endpoint": "metrics",
+                    "handler": "metadata",
+                    "instance": "10.128.10.23:9094",
+                    "job": "thanos-querier",
+                    "method": "get",
+                    "namespace": "openshift-monitoring",
+                    "pod": "thanos-querier-9c8597888-j2n5c",
+                    "service": "thanos-querier"
+                },
+                "value": [
+                    1664939722.46,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "__name__": "http_requests_total",
+                    "code": "200",
+                    "container": "kube-rbac-proxy-metrics",
+                    "endpoint": "metrics",
+                    "handler": "query",
+                    "instance": "10.128.10.23:9094",
+                    "job": "thanos-querier",
+                    "method": "get",
+                    "namespace": "openshift-monitoring",
+                    "pod": "thanos-querier-9c8597888-j2n5c",
+                    "service": "thanos-querier"
+                },
+                "value": [
+                    1664939722.46,
+                    "36"
+                ]
+            },
+            {
+                "metric": {
+                    "__name__": "http_requests_total",
+                    "code": "200",
+                    "container": "kube-rbac-proxy-metrics",
+                    "endpoint": "metrics",
+                    "handler": "query",
+                    "instance": "10.128.12.23:9094",
+                    "job": "thanos-querier",
+                    "method": "get",
+                    "namespace": "openshift-monitoring",
+                    "pod": "thanos-querier-9c8597888-wcc7k",
+                    "service": "thanos-querier"
+                },
+                "value": [
+                    1664939722.46,
+                    "33"
+                ]
+            },
+            {
+                "metric": {
+                    "__name__": "http_requests_total",
+                    "code": "200",
+                    "container": "kube-rbac-proxy-metrics",
+                    "endpoint": "metrics",
+                    "handler": "query_range",
+                    "instance": "10.128.10.23:9094",
+                    "job": "thanos-querier",
+                    "method": "get",
+                    "namespace": "openshift-monitoring",
+                    "pod": "thanos-querier-9c8597888-j2n5c",
+                    "service": "thanos-querier"
+                },
+                "value": [
+                    1664939722.46,
+                    "30"
+                ]
+            },
+            {
+                "metric": {
+                    "__name__": "http_requests_total",
+                    "code": "200",
+                    "container": "kube-rbac-proxy-metrics",
+                    "endpoint": "metrics",
+                    "handler": "query_range",
+                    "instance": "10.128.12.23:9094",
+                    "job": "thanos-querier",
+                    "method": "get",
+                    "namespace": "openshift-monitoring",
+                    "pod": "thanos-querier-9c8597888-wcc7k",
+                    "service": "thanos-querier"
+                },
+                "value": [
+                    1664939722.46,
+                    "27"
+                ]
+            },
+            {
+                "metric": {
+                    "__name__": "http_requests_total",
+                    "code": "200",
+                    "container": "kube-rbac-proxy-metrics",
+                    "endpoint": "metrics",
+                    "handler": "rules",
+                    "instance": "10.128.10.23:9094",
+                    "job": "thanos-querier",
+                    "method": "get",
+                    "namespace": "openshift-monitoring",
+                    "pod": "thanos-querier-9c8597888-j2n5c",
+                    "service": "thanos-querier"
+                },
+                "value": [
+                    1664939722.46,
+                    "795"
+                ]
+            },
+            {
+                "metric": {
+                    "__name__": "http_requests_total",
+                    "code": "200",
+                    "container": "kube-rbac-proxy-metrics",
+                    "endpoint": "metrics",
+                    "handler": "rules",
+                    "instance": "10.128.12.23:9094",
+                    "job": "thanos-querier",
+                    "method": "get",
+                    "namespace": "openshift-monitoring",
+                    "pod": "thanos-querier-9c8597888-wcc7k",
+                    "service": "thanos-querier"
+                },
+                "value": [
+                    1664939722.46,
+                    "339"
+                ]
+            }
+        ]
+    }
+}
