@@ -1,16 +1,20 @@
 #!/bin/bash
 
+echo 'wait 10 min for cluster to initialize'
+sleep 600
 rosa create admin --cluster=rosa-client > createAdmin.txt
 admin_login_cmd=`python3 pythonScripts/parseAdminLogin.py`
 echo $admin_login_cmd
-echo 'wait 5 min for id server to get ready'
-sleep 300
+echo 'wait 10 min for id server to get ready'
+sleep 600
 admin_login_output=`$admin_login_cmd`
 echo $admin_login_output
 echo "Create Sucrose project"
 oc new-project sucrose-app --description="Prometheus scrape app with secrecy: Sucrose"
 oc project sucrose-app
 oc adm policy add-cluster-role-to-user cluster-reader system:serviceaccount:sucrose-app:default
+echo 'wait 1 min for cluster to initialize new role'
+sleep 60
 service_acc_info=`oc describe sa default`
 echo $service_acc_info
 token_name=`python3 pythonScripts/parseSA.py $service_acc_info`
