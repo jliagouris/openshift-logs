@@ -3,15 +3,16 @@ package configs
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"gopkg.in/yaml.v3"
 )
 
 type PrometheusConf struct {
-	Route     string `yaml:"route"`
-	Token     string `yaml:"token"`
 	Query     string `yaml:"query"`
 	NumWorker int    `yaml:"numWorker"`
+	Route     string
+	Token     string
 	ClientId  string
 	Interval  string
 }
@@ -25,6 +26,9 @@ func (ps *PrometheusConf) LoadConfig() error {
 			return err
 		}
 	}
-
+	ps.Route = os.Getenv("PROM_URL")
+	ps.Token = os.Getenv("PROM_TOKEN")
+	fmt.Printf("Prom Route: %v\n", ps.Route)
+	fmt.Printf("Prom Token: %v\n", ps.Token)
 	return nil
 }

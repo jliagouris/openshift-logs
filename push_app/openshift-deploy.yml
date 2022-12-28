@@ -18,3 +18,8 @@ spec:
           image: jingyusu/push_app-0:demo
           #image: jingyusu/push_app-1:demo
           imagePullPolicy: IfNotPresent
+          env:
+          - name: PROM_URL
+            value: <prom_url>
+          - name: PROM_TOKEN
+            value: <prom_token>
