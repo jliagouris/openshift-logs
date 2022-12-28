@@ -5,8 +5,8 @@ sleep 600
 rosa create admin --cluster=rosa-client > createAdmin.txt
 admin_login_cmd=`python3 pythonScripts/parseAdminLogin.py`
 echo $admin_login_cmd
-echo 'wait 10 min for id server to get ready'
-sleep 600
+echo 'wait 15 min for id server to get ready'
+sleep 900
 admin_login_output=`$admin_login_cmd`
 echo $admin_login_output
 echo "Create Sucrose project"

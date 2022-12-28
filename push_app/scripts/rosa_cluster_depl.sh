@@ -16,5 +16,5 @@ done
 
 echo "Cluster installation finished"
 
-./cluster_setup.sh
+./rosa_cluster_setup.sh
 
