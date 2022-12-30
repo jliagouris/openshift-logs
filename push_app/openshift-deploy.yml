@@ -15,7 +15,7 @@ spec:
     spec:                        # Spec for the container which will run in the Pod
       containers:
         - name: push-app
-          image: jingyusu/push_app-0:demo
+          image: jingyusu/push_app:latest
           #image: jingyusu/push_app-1:demo
           imagePullPolicy: IfNotPresent
           env:
