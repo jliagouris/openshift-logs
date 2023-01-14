@@ -35,7 +35,8 @@ details, please look at: [Configurable Parameters](docs/config_param.md).
 - General: 
   
   1. Make sure that [Openshift CLI](https://docs.openshift.com/container-platform/4.8/cli_reference/openshift_cli/getting-started-cli.html) is installed.
-  2. This project runs successfully on Linux(Ubuntu) and MacOS. Success of deployment and running on Windows is not guaranteed (most likely it won't).
+  2. Install [Docker](https://www.docker.com/), preferably Docker Desktop, which comes with GUI.
+  3. This project runs successfully on Linux(Ubuntu) and MacOS. Success of deployment and running on Windows is not guaranteed (most likely it won't).
 - ROSA (Redhat Openshift on AWS) cluster:
   
   1. Have [ROSA CLI](https://docs.openshift.com/rosa/rosa_cli/rosa-get-started-cli.html) installed.
