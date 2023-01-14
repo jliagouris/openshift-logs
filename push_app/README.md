@@ -21,6 +21,11 @@ Periodic Push:
 Ad-hoc Pull:
 ![image](pictures/pull.png)
 
+### Components:
+- Data Source: Component that sends queries to Prometheus, recieves response, and sends structured response to components downstream of the pipeline.
+- Parser: Parses the response and extracts predefined arguments, in order to reduce workload of downstream components.
+
+
 ## Configurable Parameters:
 The application supports a number of configurable parameters, all defined in config.yaml. For 
 details, please look at: [Configurable Parameters](docs/config_param.md).
