@@ -1,4 +1,4 @@
 #!/bin/bash
 
-python3 pythonScripts/sucDeplYamlProcess.py
-oc apply -f ../openshift-deploy.yaml
+python3 scripts/pythonScripts/sucDeplYamlProcess.py $1
+oc apply -f openshift-deploy.yaml
