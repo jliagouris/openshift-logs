@@ -18,6 +18,8 @@ spec:
           value: <prometheus-url>
         - name: PROM_TOKEN
           value: <prometheus-token>
+        - name: CLIENT_ID
+          value: <client-id>
         image: jingyusu/push_app:latest
         imagePullPolicy: IfNotPresent
         name: push-app
