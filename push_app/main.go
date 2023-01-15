@@ -5,6 +5,7 @@ package main
 import (
 	"io/ioutil"
 	"log"
+	"os"
 	"push_app/components"
 	"push_app/configs"
 	"sync"
@@ -109,5 +110,6 @@ func getGlobalConfig(yamlFile []byte) configs.OperatorConf {
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)
 	}
+	opConf.ClientId = os.Getenv("CLIENT_ID")
 	return opConf
 }
