@@ -78,8 +78,8 @@ Building Instructions
    * Some times the changes made will not be shown in the new image (I don't know why). I bypass this problem by changing image name/tag.
 
 ###
-Deployment Instructions
-
+Deployment Instructions\
+Installation of a cluster will likely take around an hour. The scripts will need to be updated to parallelize the process.
 ###
 Deletion Instructions
 Deletion of clusters are manual at this moment.
@@ -118,9 +118,10 @@ Deletion of clusters are manual at this moment.
 
 ## TODOs
 1. Automation scripts for other cloud providers (Primarily Chameleon)
-2. Edit scripts to deploy workload from Vivek's work.
-3. Combine push and ad-hoc into a single app (tried but had bugs and failed) or automate ad-hoc in the same way as push
-4. Parallelization of components (autoscaling if possible)
+2. Parallelize deployment of multiple clusters to save time.
+3. Edit scripts to deploy workload from Vivek's work.
+4. Combine push and ad-hoc into a single app (tried but had bugs and failed) or automate ad-hoc in the same way as push
+5. Parallelization of components (autoscaling if possible)
 
 
 
