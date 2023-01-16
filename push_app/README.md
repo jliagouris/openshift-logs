@@ -81,6 +81,11 @@ Building Instructions
 ###
 Deployment Instructions\
 Installation of a cluster will likely take around an hour. The scripts will need to be updated to parallelize the process.
+Run 
+```Bash
+./main.sh
+```
+To start cluster deployment and Sucrose installation
 ###
 Deletion Instructions
 Deletion of clusters are manual at this moment.
@@ -105,16 +110,18 @@ Deletion of clusters are manual at this moment.
    Files under **configs** directory corresponds to configs of components other than parser. 
    - kafkaClientConf.go: Parses and loads configurations of kafka brokers in ``config.yaml``
    - operatorConf.go: Parses and loads global application configurations in ``config.yaml``
-   - prometheusConf.go: Parses and loads Prometheus configurations in ``prom_config.yaml``
+   - prometheusConf.go: Parses and loads Prometheus configurations in ``prom_config.yaml``\
+    \
+  prom_config.yaml contains configuration for Prometheus datasource, config.yaml contains configuration for parser, Kafka client, and global config. rosa_config contains rosa cluster config.
 3. Credentials\
   Prometheus parsing credentials are generated upon cluster creation and stored in **credentials** directory.\
   \
   Credentials for rosa openshift cluster login is stored in text file **scripts/createAdmin-rosa-\<client id>.txt** for each ROSA cluster.
-4. Queries
+1. Queries
   Files under **Queries** directory contains some sample queries as well as Prometheus response to assist understanding.
-5. Response\
+1. Response\
   **Response/PrometheusResp.go** defines data structure that holds fields of Prometheus query response.
-6. scripts\
+1. scripts\
   Files under **scripts** directory are automation scripts to create and setup the cluster as well as installing Sucrose on the cluster. The names of the scripts should be self explanatory.
 
 ## TODOs
