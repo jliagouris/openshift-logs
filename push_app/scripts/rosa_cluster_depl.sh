@@ -19,13 +19,13 @@ done
 echo "Cluster installation finished"
 echo 'wait 10 min for cluster to initialize'
 sleep 600
-rosa create admin --cluster=rosa-client-$client_id > createAdmin-rosa-$client_id.txt
-admin_login_cmd=`python3 scripts/pythonScripts/parseAdminLogin.py`
+rosa create admin --cluster=rosa-client-$client_id > scripts/createAdmin-rosa-$client_id.txt
+admin_login_cmd=`python3 scripts/pythonScripts/parseAdminLogin.py rosa $client_id`
 echo $admin_login_cmd
 echo 'wait 15 min for id server to get ready'
 sleep 900
 admin_login_output=`$admin_login_cmd`
 echo $admin_login_output
 
-./scripts/rosa_cluster_setup.sh 'rosa' $client_id
+./scripts/rosa_cluster_setup.sh rosa $client_id
 
