@@ -8,18 +8,18 @@ spec:
     matchLabels:
       app: push-app
   template:
-    metadata:
+    metadata: 
       labels:
         app: push-app
     spec:
       containers:
       - env:
         - name: PROM_URL
-          value: <prometheus-url>
+          value: <prom_url>
         - name: PROM_TOKEN
-          value: <prometheus-token>
+          value: <prom_token>
         - name: CLIENT_ID
           value: <client-id>
-        image: jingyusu/push_app:latest
+        image: jingyusu/push_app:test1
         imagePullPolicy: IfNotPresent
         name: push-app
