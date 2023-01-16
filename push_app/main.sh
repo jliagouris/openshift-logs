@@ -39,15 +39,12 @@ do
     if [ $choice -eq 1 ]
     then
         read aws_client_cnt
-        #echo $aws_client_cnt
         for((i=0;i<$aws_client_cnt;i++));  
-        do   
-            #echo $i;  
+        do     
             bash scripts/rosa_cluster_depl.sh $i $client_cnt_total
             ((client_cnt_total=client_cnt_total+1))
             echo "client id: $client_cnt_total"
         done  
-        #./scripts/rosa_cluster_depl.sh
     elif [ $choice -eq 2 ]
     then
         read chameleon_client_cnt
