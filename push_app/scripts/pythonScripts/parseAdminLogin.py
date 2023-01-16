@@ -1,5 +1,11 @@
 #open text file in read mode
-text_file = open("scripts/createAdmin.txt", "r")
+import sys
+
+filename = "scripts/createAdmin-"
+filename += sys.argv[1]
+filename += "-" + str(sys.argv[2])
+filename += ".txt"
+text_file = open(filename, "r")
  
 #read whole file to a string
 admin_login_cmd = text_file.read()
