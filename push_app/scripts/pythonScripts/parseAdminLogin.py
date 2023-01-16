@@ -1,7 +1,7 @@
 #open text file in read mode
 import sys
 
-filename = "scripts/createAdmin-"
+filename = sys.path[0] + "/../createAdmin-"
 filename += sys.argv[1]
 filename += "-" + str(sys.argv[2])
 filename += ".txt"
