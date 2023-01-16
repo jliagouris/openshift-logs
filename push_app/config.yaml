@@ -2,7 +2,6 @@
 parallelism: 1
 chan_buf_size: 8
 time_interval: "15s"
-client_id: 1
 
 Clusters:
   cluster_0:
