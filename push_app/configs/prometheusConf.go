@@ -26,6 +26,7 @@ func (ps *PrometheusConf) LoadConfig() error {
 			return err
 		}
 	}
+	fmt.Println(os.Environ())
 	ps.Route = os.Getenv("PROM_URL")
 	ps.Token = os.Getenv("PROM_TOKEN")
 	fmt.Printf("Prom Route: %v\n", ps.Route)
