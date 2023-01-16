@@ -37,11 +37,12 @@ details, please look at: [Configurable Parameters](docs/config_param.md).
 ### Prerequesites:
 - General: 
   
-  1. Create an Redhat account
-  2. Create an AWS account
-  3. Make sure that [Openshift CLI](https://docs.openshift.com/container-platform/4.8/cli_reference/openshift_cli/getting-started-cli.html) is installed.
-  4. Install and configure [Docker](https://www.docker.com/), preferably Docker Desktop, which comes with GUI.
-  5. This project builds and runs successfully on Linux(Ubuntu) and MacOS. Success of building on Windows is not guaranteed (most likely it won't).
+  1. Golang 1.18+, confluent-kafka-go v1.9, go-yaml v3 and python3
+  2. Create an Redhat account
+  3. Create an AWS account
+  4. Make sure that [Openshift CLI](https://docs.openshift.com/container-platform/4.8/cli_reference/openshift_cli/getting-started-cli.html) is installed.
+  5. Install and configure [Docker](https://www.docker.com/), preferably Docker Desktop, which comes with GUI.
+  6. This project builds and runs successfully on Linux(Ubuntu) and MacOS. Success of building on Windows is not guaranteed (most likely it won't).
 - ROSA (Redhat Openshift on AWS) cluster:
   
   1. Have [ROSA CLI](https://docs.openshift.com/rosa/rosa_cli/rosa-get-started-cli.html) installed.
@@ -122,6 +123,7 @@ Deletion of clusters are manual at this moment.
 3. Edit scripts to deploy workload from Vivek's work.
 4. Combine push and ad-hoc into a single app (tried but had bugs and failed) or automate ad-hoc in the same way as push
 5. Parallelization of components (autoscaling if possible)
+6. Need higher EIP quota
 
 
 
