@@ -23,4 +23,4 @@ prom_url=`oc -n openshift-monitoring get routes | grep prometheus-k8s-openshift-
 echo $prom_url
 echo $prom_url > credentials/prom_url-$cluster_provider-$client_id.txt
 
-./scripts/sucrose_install.sh
+./scripts/sucrose_install.sh $cluster_provider $client_id
