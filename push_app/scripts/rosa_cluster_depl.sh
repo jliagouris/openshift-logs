@@ -3,7 +3,7 @@
 client_id=$1
 echo "creating rosa-client-$client_id"
 rosa create account-roles --mode auto --yes
-rosa create cluster --cluster-name rosa-client-$client_id --sts --mode auto --yes
+rosa create cluster --cluster-name rosa-client-$client_id --version 4.11.3 --sts --mode auto --yes
 
 # wait until cluster is successfully deployed
 cluster_info=`rosa describe cluster -c rosa-client-$client_id`
