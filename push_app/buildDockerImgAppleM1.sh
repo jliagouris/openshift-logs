@@ -5,8 +5,8 @@ docker buildx build --platform linux/amd64 -t push_app .
 
 echo 'docker build finished'
 
-docker tag push_app jingyusu/push_app:latest
+docker tag push_app jingyusu/push_app:test1
 
 docker login
 
-docker push jingyusu/push_app:latest
+docker push jingyusu/push_app:test1
