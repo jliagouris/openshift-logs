@@ -1,0 +1,38 @@
+#!/bin/bash
+
+client_id=$1
+echo "creating rosa-client-$client_id"
+rosa create account-roles --mode auto --yes
+echo "Use default setting (mx5.xlarge, 2 nodes, version 4.11.3) or custom setting? (y/n)"
+read depl_mode
+if [ $depl_mode -eq y ]
+then
+    rosa create cluster --cluster-name rosa-client-$client_id --version 4.11.3 --sts --mode auto --yes
+else 
+    python3 scripts/pythonScripts/parseConfigAndCreateCluster.py $client_id
+fi
+
+# wait until cluster is successfully deployed
+cluster_info=`rosa describe cluster -c rosa-client-$client_id`
+cluster_state=`python3 scripts/pythonScripts/parseClusterState.py $cluster_info`
+while [ "$cluster_state" != "ready" ]
+do
+    echo "cluster $1 is $cluster_state, check after 5m"
+    sleep 300
+    cluster_info=`rosa describe cluster -c rosa-client-$client_id`
+    cluster_state=`python3 scripts/pythonScripts/parseClusterState.py $cluster_info`
+done
+
+echo "Cluster installation finished"
+echo 'wait 10 min for cluster to initialize'
+sleep 600
+rosa create admin --cluster=rosa-client-$client_id > scripts/createAdmin-rosa-$client_id.txt
+admin_login_cmd=`python3 scripts/pythonScripts/parseAdminLogin.py rosa $client_id`
+echo $admin_login_cmd
+echo 'wait 15 min for id server to get ready'
+sleep 900
+admin_login_output=`$admin_login_cmd`
+echo $admin_login_output
+
+./scripts/rosa_cluster_setup.sh rosa $client_id
+

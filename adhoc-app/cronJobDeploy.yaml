@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: prom-app
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: "Replace"
+  startingDeadlineSeconds: 200
+  suspend: false
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            parent: "cronjob-prom"
+        spec:
+          containers:
+            - name: prom-app
+              image: jingyusu/prometheus-app:1.0.1
+          restartPolicy: OnFailure

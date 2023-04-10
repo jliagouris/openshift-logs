@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: push-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: push-app
+  template:
+    metadata: 
+      labels:
+        app: push-app
+    spec:
+      containers:
+      - env:
+        - name: PROM_URL
+          value: <prom_url>
+        - name: PROM_TOKEN
+          value: <prom_token>
+        - name: CLIENT_ID
+          value: <client-id>
+        image: jingyusu/push_app:test1
+        imagePullPolicy: IfNotPresent
+        name: push-app

@@ -1,0 +1,9 @@
+---
+Query: topk(8, sum by (container) (rate(container_cpu_usage_seconds_total{container=~".+"}[30m])) / 2 > 0)
+Keys:
+  - value
+  - Container
+Topic: ad-hoc
+Urls:
+  - "http://adhoc-route-secrecy-app.apps.client-1.3pdv.p1.openshiftapps.com"
+  - "http://adhoc-route-secrecy-app.apps.client-0.kmiu.p1.openshiftapps.com"

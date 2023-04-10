@@ -1,6 +1,6 @@
 # Open Shift Logs
 
-_(Author: Adarsh Verma)_
+_(Author: Adarsh Verma, Jingyu Su)_
 
 This repository contains step-by-step instructions for setting up, accessing and querying logs from Operate First Clusters. Operate First is a concept where open source developers bring their projects to a production cloud during development where they can interact with a cloud provider’s operators and gain valuable feedback on the operational considerations of their project. The motivation for the Operate First initiative is the shift of focus from software availability to operating services. Open Source removed the access to software as a limiting factor for businesses and individuals. However, with software proliferating into every aspect of the business – and our world in general – resulting in ever growing complexity of software stacks, the challenge is now operationalizing software.
 
@@ -23,6 +23,16 @@ For generating API token (expires every 24 hours) please follow the steps below:
 - Click on the user icon in the top right corner   
 - Click on 'Copy login command'    
 - Authenticate again and copy the token    
+
+### OpenShift Alets
+All alert related metrics are stored in Prometheus data source. To check out metric names, labels & other relevant information, select the campus icon on Grafana left side bar, choose the Prometheus source to query, e.g. moc-smaug. 
+![image](Resources/Pictures/grafana_metrics.png)
+
+For alert rules & details, click the alert icon on Grafana side bar, or check out [OpenShift Runbooks](https://github.com/openshift/runbooks).
+
+Alert rules aggregation queries are written in PromQL, for tutorial of PromQL, check out [PromQL Doc](https://prometheus.io/docs/prometheus/latest/querying/basics/).
+
+For plain language/SQL explaination of the aggregation queries, check out [here](alert_query_desc.md).
 
 ## Additional Documents
 - [Log Observations Journal](https://docs.google.com/document/d/1Pb0xdlxUSjIeKBK-z8UvV4CpFFLiU4pHJz5MjZUl3b8/edit?usp=sharing)   

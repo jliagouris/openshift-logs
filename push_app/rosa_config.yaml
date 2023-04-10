@@ -1,0 +1,2 @@
+compute-machine-type: m6i.xlarge
+replicas: 3

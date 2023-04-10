@@ -1,0 +1,46 @@
+---
+parallelism: 1
+chan_buf_size: 8
+time_interval: "15s"
+
+Clusters:
+  cluster_0:
+    # Required connection configs for Kafka producer, consumer, and admin
+    bootstrap.servers: pkc-ymrq7.us-east-2.aws.confluent.cloud:9092
+    security.protocol: SASL_SSL
+    sasl.mechanisms: PLAIN
+    sasl.username: ZQRTDWRJKCGGMW7Q
+    sasl.password: XN45jOMZV6yKD2dlhuKD3vX5OQnjhGbAcn21qToyHX9j3Khoyp1MUK4xj8rdqiaW
+
+    # Best practice for higher availability in librdkafka clients prior to 1.7
+    session.timeout.ms: 45000
+
+  cluster_1:
+
+    # Required connection configs for Kafka producer, consumer, and admin
+    bootstrap.servers: pkc-lzvrd.us-west4.gcp.confluent.cloud:9092
+    security.protocol: SASL_SSL
+    sasl.mechanisms: PLAIN
+    sasl.username: N6DNYDWUTZV266WU
+    sasl.password: bZi80jaUoES4w04p2fq/eDOVvU8xQ1MCRQvcGcz2cUydz+zU507pRwyrRkUkSN5E
+
+    # Best practice for higher availability in librdkafka clients prior to 1.7
+    session.timeout.ms: 45000
+
+  cluster_2:
+    # Required connection configs for Kafka producer, consumer, and admin
+    bootstrap.servers: pkc-56d1g.eastus.azure.confluent.cloud:9092
+    security.protocol: SASL_SSL
+    sasl.mechanisms: PLAIN
+    sasl.username: MZYOWFIYCONX55OF
+    sasl.password: 3meaCUzwMtZQLgLcSxEspLZ7qzmLS76VV7oH9mVa/colplqXceqSd2DXquho9DdM
+
+    # Best practice for higher availability in librdkafka clients prior to 1.7
+    session.timeout.ms: 45000
+
+
+parserConfig:
+  topic: "periodic"
+  logSchema:
+    - key: "value"
+      nullable: true

@@ -1,0 +1,2 @@
+query: 'sum by (container) (rate(container_cpu_usage_seconds_total{container="etcd"}[30m])) > bool 0.20'
+numWorker: 1
