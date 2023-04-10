@@ -119,6 +119,8 @@ The contents of the `chameleon-cloud-migration` directory include the following 
   * `kube_worker` : Ansible requirement. The directory corresponds to an **Ansible role** specific to the k8s worker nodes.
   * `playbooks` : Ansible requirement. Stores the playbooks to provision and delete the provisioned resources.
   * `local` : Ansible requirement. The directory corresponds to an **Ansible role** specific to our local machine.
+  * `benchmark_application_deployer` : Ansible requirement. The directory corresponds to an **Ansible role** specific to deploying the chosen benchmark application.
+  * `sucrose_deployer` : Ansible requirement. The directory corresponds to an **Ansible role** specific to deploying the sucrose application.
 
 **Files**
 
