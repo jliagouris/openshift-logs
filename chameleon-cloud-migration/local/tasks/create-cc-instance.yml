@@ -1,0 +1,104 @@
+# ---
+# # subtasks file for chameleon instance creation
+
+# - name: create chameleon reservation (hosts)
+#   become: true
+#   shell: |
+#     openstack --os-cloud=openstack reservation lease create \
+#     --reservation min=$(({{cloud_providers.cc.cluster.num_clusters}} * {{cloud_providers.cc.cluster.num_nodes_per_cluster}})),max=$(({{cloud_providers.cc.cluster.num_clusters}} * {{cloud_providers.cc.cluster.num_nodes_per_cluster}})),resource_type=physical:host,resource_properties='["=", "$node_type", "compute_cascadelake_r"]' \
+#     --end-date="$(date -u -v +7d +'%F %H:%M')" \
+#     {{cloud_providers.cc.lease_name}}-hosts \
+#     -c id -f value > ./cc/cc-cluster-reservation.txt
+
+
+# - name: create floating IPs for the instances
+#   become: true
+#   shell: |
+#     openstack --os-cloud=openstack floating ip create public -c floating_ip_address -f value >> ./cc/cc-floating-IPs.txt
+#   with_sequence: count={{cloud_providers.cc.cluster.num_clusters * cloud_providers.cc.cluster.num_nodes_per_cluster}}
+
+# # # '["and", ["!=", "gpu", "true"], ["!=", "$architecture.smt_size", "48"], ["=", "$node_type", "compute_haswell"]]' \
+
+# - name: create ssh key pair
+#   become: true
+#   shell: openstack --os-cloud=openstack keypair create {{cloud_providers.cc.ssh_key_pair_name }} > ./cc/cc-ssh-private-key.key
+
+# - name: create instances using the reservation
+#   become: true
+#   shell: |
+#     openstack --os-cloud=openstack server create \
+#     --image=$(openstack --os-cloud=openstack image list --property name=CC-Ubuntu20.04 --property status=active -c ID -f value) \
+#     --flavor={{cloud_providers.cc.instance_flavor}} \
+#     --key-name={{ cloud_providers.cc.ssh_key_pair_name }} \
+#     --nic net-id=$(openstack --os-cloud=openstack network show sharednet1 -c id -f value) \
+#     --hint reservation=$(openstack --os-cloud=openstack reservation lease show {{cloud_providers.cc.lease_name}}-hosts -c reservations -f value | python3 -c "import sys, json; print(json.load(sys.stdin)['id'])") \
+#     --min {{cloud_providers.cc.cluster.num_nodes_per_cluster}} \ 
+#     --max {{cloud_providers.cc.cluster.num_nodes_per_cluster}} \
+#     {{cloud_providers.cc.instance_name}}-{{item}}
+#   with_sequence: count={{cloud_providers.cc.cluster.num_clusters}}
+
+# ##########
+# # WAIT HERE UNTIL INSTANCE CREATION
+# ##########
+# - name: Pause for a minute, for Chameleon to start building the instances
+#   ansible.builtin.pause:
+#     minutes: 1
+
+# - name: get all instance names
+#   become: true
+#   shell: |
+#     openstack --os-cloud=openstack server list --name {{cloud_providers.cc.instance_name}} -c Name -f value > ./cc/cc-instance-names.txt
+
+# - name: generate temp file
+#   become: true
+#   shell: |
+#     paste -d " " ./cc/cc-instance-names.txt ./cc/cc-floating-IPs.txt > ./cc/temp.txt
+
+# - name: allocate floating IPs to instances
+#   become: true
+#   shell: |
+#     openstack --os-cloud=openstack server add floating ip {{item}}
+#   loop: "{{ lookup('file', './cc/temp.txt').splitlines() }}"
+
+# - name: create the hosts file with instance floating IPs [control plane node]
+#   become: true
+#   shell: |
+#     echo "[head]" > ../inventory/hosts
+
+# - name: create the hosts file with instance floating IPs [control plane node]
+#   become: true
+#   shell: |
+#     echo {{ item | split(' ') | first }} ansible_host={{item | split(' ') | last}} >> ../inventory/hosts
+#   loop: "{{ lookup('file', './cc/temp.txt').splitlines() }}"
+#   when: item|split(' ')|first|regex_search("-1$")
+
+# - name: create the hosts file with instance floating IPs [worker node]
+#   become: true
+#   shell: |
+#     echo "\n[worker]" >> ../inventory/hosts
+
+# - name: create the hosts file with instance floating IPs [worker node]
+#   become: true
+#   shell: |
+#     echo {{ item | split(' ') | first }} ansible_host={{item | split(' ') | last}} >> ../inventory/hosts
+#   loop: "{{ lookup('file', './cc/temp.txt').splitlines() }}"
+#   when: item|split(' ')|first|regex_search("^(?!.*-1$).*")
+
+# - name: soft reboot all nodes
+#   become: true
+#   shell: |
+#     openstack --os-cloud=openstack server reboot {{item}}
+#   loop: "{{ lookup('file', './cc/cc-instance-names.txt').splitlines() }}"
+#   register: reboot_result
+#   until: reboot_result is success
+#   retries: 6
+#   delay: 300
+
+# - meta: refresh_inventory
+
+# - name: Pause for 10 minutes for the instances to reboot
+#   ansible.builtin.pause:
+#     minutes: 10
+
+# ## TODO: delete the intermediate files folder once the cluster is setup
+# # tagging instances to filter later

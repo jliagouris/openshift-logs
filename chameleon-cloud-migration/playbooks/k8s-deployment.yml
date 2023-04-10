@@ -1,0 +1,15 @@
+- hosts: localhost
+  roles:
+  - local
+
+- hosts: head
+  roles:
+  - kube_head
+
+- hosts: worker
+  roles:
+  - kube_worker
+
+- hosts: head
+  roles:
+  - benchmark_application_deployer

@@ -1,0 +1,4 @@
+---
+# tasks file for local
+
+- include_tasks: create-cc-instance.yml
