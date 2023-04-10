@@ -1,0 +1,33 @@
+---
+# vars file for local
+
+github:
+  username: ""
+  access_token: ""
+
+
+benchmark_application:
+  application_choice: "online-boutique"
+  wrk2:
+    num_threads: 200
+    num_connections: 500
+    benchmark_duration: 20m
+    total_rps: 2000
+
+
+cloud_providers:
+  cc:
+    lease_name: "my-test-lease"
+    ssh_key_pair_name: "my-test-ssh-key-pair"
+    instance_name: "my-test-instance"
+    instance_flavor: "baremetal"
+    default_instance_user: "cc"
+    
+    cluster:
+      num_clusters: 2
+      num_nodes_per_cluster: 4
+
+  aws:
+  gcp:
+  azure: 
+  nerc:
