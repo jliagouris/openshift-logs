@@ -36,14 +36,14 @@
 #     mode: 'u+x,g+x'
 #   when: benchmark_application.application_choice == "hotel-reservation"
 
-- name: install luarocks
-  apt:
-    name: luarocks
-    state: present
+# - name: install luarocks
+#   apt:
+#     name: luarocks
+#     state: present
 
-- name: install luasocket using luarocks
-  become: true
-  shell: luarocks install luasocket
+# - name: install luasocket using luarocks
+#   become: true
+#   shell: luarocks install luasocket
 
 # - name: clone <Hotel Reservation> microservices repository from GitHub
 #   become: true
@@ -54,16 +54,26 @@
 #     version: master
 #   when: benchmark_application.application_choice == "hotel-reservation"
 
-- name: deploy the hotel reservation application on the k8s cluster
+- name: make the docker image build script executable (hotel reservation application requirement)
+  file: dest=./hotel-reservation/hotelReservation/kubernetes/scripts/build-docker-images.sh mode=a+x
+
+- name: build local docker image (hotel reservation application requirement)
   become: true
-  shell: kubectl apply -Rf ./hotel-reservation/hotelReservation/kubernetes/
+  shell: ./hotel-reservation/hotelReservation/kubernetes/scripts/build-docker-images.sh
   environment:
     KUBECONFIG: ./.kube/config
   when: benchmark_application.application_choice == "hotel-reservation"
 
+# - name: deploy the hotel reservation application on the k8s cluster
+#   become: true
+#   shell: kubectl apply -Rf ./hotel-reservation/hotelReservation/kubernetes/
+#   environment:
+#     KUBECONFIG: ./.kube/config
+#   when: benchmark_application.application_choice == "hotel-reservation"
+
 - name: run wrk2 load generator for the hotel reservation application
   become: true
-  shell: kubectl apply -Rf ./hotel-reservation/hotelReservation/kubernetes/
+  shell: ./hotel-reservation/hotelReservation/wrk2 -D exp -t 20 -c 20 -d 5m -L -s ./wrk2/scripts/hotel-reservation/mixed-workload_type_1.lua http://frontend.hotel-res.svc.cluster.local:5000 -R 100
   environment:
     KUBECONFIG: ./.kube/config
   when: benchmark_application.application_choice == "hotel-reservation"
