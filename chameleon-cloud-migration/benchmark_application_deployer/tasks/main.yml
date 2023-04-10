@@ -1,3 +1,69 @@
 ---
 # tasks file for benchmark_application_deployer
 
+- name: include vars of main.yaml of local into current role
+  ansible.builtin.include_vars:
+    file: ../../local/vars/main.yml
+    
+# - name: clone <Online Boutique> microservices repository from GitHub
+#   become: true
+#   ansible.builtin.git:
+#     repo: https://github.com/GoogleCloudPlatform/microservices-demo.git
+#     dest: ./microservices-demo/
+#     single_branch: yes
+#     version: main
+#   when: benchmark_application.application_choice == "online-boutique"
+
+- name: delete all existing deployments on the cluster
+  become: true
+  shell: kubectl delete deployments --all
+  environment:
+    KUBECONFIG: ./.kube/config
+
+# - name: deploy the online boutique application on the k8s cluster
+#   become: true
+#   shell: kubectl apply -f ./microservices-demo/release/kubernetes-manifests.yaml
+#   environment:
+#     KUBECONFIG: ./.kube/config
+#   when: benchmark_application.application_choice == "online-boutique"
+
+## install luarocks and luasocket and docker-compose here
+# - name: Install docker-compose
+#   remote_user: cc
+#   get_url: 
+#     url : https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-linux-x86_64
+#     dest: /usr/local/bin/docker-compose
+#     mode: 'u+x,g+x'
+#   when: benchmark_application.application_choice == "hotel-reservation"
+
+- name: install luarocks
+  apt:
+    name: luarocks
+    state: present
+
+- name: install luasocket using luarocks
+  become: true
+  shell: luarocks install luasocket
+
+# - name: clone <Hotel Reservation> microservices repository from GitHub
+#   become: true
+#   ansible.builtin.git:
+#     repo: https://github.com/delimitrou/DeathStarBench.git
+#     dest: ./hotel-reservation/
+#     single_branch: yes
+#     version: master
+#   when: benchmark_application.application_choice == "hotel-reservation"
+
+- name: deploy the hotel reservation application on the k8s cluster
+  become: true
+  shell: kubectl apply -Rf ./hotel-reservation/hotelReservation/kubernetes/
+  environment:
+    KUBECONFIG: ./.kube/config
+  when: benchmark_application.application_choice == "hotel-reservation"
+
+- name: run wrk2 load generator for the hotel reservation application
+  become: true
+  shell: kubectl apply -Rf ./hotel-reservation/hotelReservation/kubernetes/
+  environment:
+    KUBECONFIG: ./.kube/config
+  when: benchmark_application.application_choice == "hotel-reservation"

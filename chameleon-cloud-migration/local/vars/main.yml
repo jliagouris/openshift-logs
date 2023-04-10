@@ -7,7 +7,7 @@ github:
 
 
 benchmark_application:
-  application_choice: "online-boutique"
+  application_choice: "hotel-reservation"
   wrk2:
     num_threads: 200
     num_connections: 500
