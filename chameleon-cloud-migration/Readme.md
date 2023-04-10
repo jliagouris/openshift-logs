@@ -93,7 +93,7 @@ git clone --branch kabilan https://github.com/jliagouris/openshift-logs
 cd ./openshift-logs/chameleon-cloud-migration
 ```
 
-1. Copy the `clouds.yaml` file downloaded previously into the `playbooks` sub-directory in the `chameleon-cloud-migration` directory.
+1. Copy the `clouds.yaml` file downloaded previously, into the `playbooks` sub-directory in the `chameleon-cloud-migration` directory.
    
 2. Run the `k8s-deployment.yml` playbook present in the playbooks directory.
 ```
