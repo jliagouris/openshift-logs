@@ -2,8 +2,8 @@
 # vars file for local
 
 github:
-  username: "kabilanmohanraj"
-  access_token: "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"
+  username: ""
+  access_token: ""
 
 
 benchmark_application:
