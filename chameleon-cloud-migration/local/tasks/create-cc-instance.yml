@@ -23,6 +23,10 @@
   become: true
   shell: openstack --os-cloud=openstack keypair create {{cloud_providers.cc.ssh_key_pair_name }} > ./cc/cc-ssh-private-key.key
 
+- name: provide right permissions to the private key file
+  become: true
+  shell: chmod 644 ./cc/cc-ssh-private-key.key
+
 - name: create instances using the reservation
   become: true
   shell: |
@@ -84,21 +88,28 @@
   loop: "{{ lookup('file', './cc/temp.txt').splitlines() }}"
   when: item|split(' ')|first|regex_search("^(?!.*-1$).*")
 
-- name: soft reboot all nodes
+# - name: soft reboot all nodes
+#   become: true
+#   shell: |
+#     openstack --os-cloud=openstack server reboot {{item}}
+#   loop: "{{ lookup('file', './cc/cc-instance-names.txt').splitlines() }}"
+#   register: reboot_result
+#   until: reboot_result is success
+#   retries: 6
+#   delay: 300
+
+- name: set hostnames to the created instances
   become: true
   shell: |
-    openstack --os-cloud=openstack server reboot {{item}}
-  loop: "{{ lookup('file', './cc/cc-instance-names.txt').splitlines() }}"
-  register: reboot_result
-  until: reboot_result is success
-  retries: 6
-  delay: 300
+    hostnamectl set-hostname {{inventory_hostname}}
+  loop: "{{ lookup('file', './cc/temp.txt').splitlines() }}"
+  when: "'ubuntu' in ansible_hostname"
 
 - meta: refresh_inventory
 
-- name: Pause for 10 minutes for the instances to reboot
+- name: Pause for 10 seconds to changes to take effect
   ansible.builtin.pause:
-    minutes: 10
+    seconds: 10
 
 ## TODO: delete the intermediate files folder once the cluster is setup
 # tagging instances to filter later

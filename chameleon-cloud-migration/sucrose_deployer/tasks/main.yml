@@ -1,2 +1,15 @@
 ---
 # tasks file for sucrose_deployer
+
+# deploy Prometheus to monitor our k8s cluster
+
+- name: delete all existing deployments on the cluster
+  become: true
+  shell: ls
+
+- name: set hostnames to the created instances
+  become: true
+  shell: |
+    hostnamectl set-hostname {{inventory_hostname}}
+  loop: "{{ lookup('file', './cc/temp.txt').splitlines() }}"
+  when: "'ubuntu' in ansible_hostname"

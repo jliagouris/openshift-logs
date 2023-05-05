@@ -1,11 +1,4 @@
 [head]
-my-test-instance-2-1 ansible_host=129.114.108.83
-my-test-instance-1-1 ansible_host=129.114.108.152
+my-test-instance-1 ansible_host=129.114.108.212
 
 [worker]
-my-test-instance-2-4 ansible_host=129.114.109.48
-my-test-instance-2-2 ansible_host=129.114.108.224
-my-test-instance-2-3 ansible_host=129.114.108.66
-my-test-instance-1-2 ansible_host=129.114.108.200
-my-test-instance-1-3 ansible_host=129.114.108.100
-my-test-instance-1-4 ansible_host=129.114.109.196

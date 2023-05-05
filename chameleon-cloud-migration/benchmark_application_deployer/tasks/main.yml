@@ -4,28 +4,28 @@
 - name: include vars of main.yaml of local into current role
   ansible.builtin.include_vars:
     file: ../../local/vars/main.yml
-    
-# - name: clone <Online Boutique> microservices repository from GitHub
-#   become: true
-#   ansible.builtin.git:
-#     repo: https://github.com/GoogleCloudPlatform/microservices-demo.git
-#     dest: ./microservices-demo/
-#     single_branch: yes
-#     version: main
-#   when: benchmark_application.application_choice == "online-boutique"
 
 - name: delete all existing deployments on the cluster
   become: true
   shell: kubectl delete deployments --all
   environment:
     KUBECONFIG: ./.kube/config
+  
+- name: clone <Online Boutique> microservices repository from GitHub
+  become: true
+  ansible.builtin.git:
+    repo: https://github.com/GoogleCloudPlatform/microservices-demo.git
+    dest: ./microservices-demo/
+    single_branch: yes
+    version: main
+  when: benchmark_application.application_choice == "online-boutique"
 
-# - name: deploy the online boutique application on the k8s cluster
-#   become: true
-#   shell: kubectl apply -f ./microservices-demo/release/kubernetes-manifests.yaml
-#   environment:
-#     KUBECONFIG: ./.kube/config
-#   when: benchmark_application.application_choice == "online-boutique"
+- name: deploy the online boutique application on the k8s cluster
+  become: true
+  shell: kubectl apply -f ./microservices-demo/release/kubernetes-manifests.yaml
+  environment:
+    KUBECONFIG: ./.kube/config
+  when: benchmark_application.application_choice == "online-boutique"
 
 ## install luarocks and luasocket and docker-compose here
 # - name: Install docker-compose
@@ -54,15 +54,16 @@
 #     version: master
 #   when: benchmark_application.application_choice == "hotel-reservation"
 
-- name: make the docker image build script executable (hotel reservation application requirement)
-  file: dest=./hotel-reservation/hotelReservation/kubernetes/scripts/build-docker-images.sh mode=a+x
+# - name: make the docker image build script executable (hotel reservation application requirement)
+#   file: dest=./hotel-reservation/hotelReservation/kubernetes/scripts/build-docker-images.sh mode=a+x
+#   when: benchmark_application.application_choice == "hotel-reservation"
 
-- name: build local docker image (hotel reservation application requirement)
-  become: true
-  shell: ./hotel-reservation/hotelReservation/kubernetes/scripts/build-docker-images.sh
-  environment:
-    KUBECONFIG: ./.kube/config
-  when: benchmark_application.application_choice == "hotel-reservation"
+# - name: build local docker image (hotel reservation application requirement)
+#   become: true
+#   shell: ./hotel-reservation/hotelReservation/kubernetes/scripts/build-docker-images.sh
+#   environment:
+#     KUBECONFIG: ./.kube/config
+#   when: benchmark_application.application_choice == "hotel-reservation"
 
 # - name: deploy the hotel reservation application on the k8s cluster
 #   become: true
@@ -71,9 +72,9 @@
 #     KUBECONFIG: ./.kube/config
 #   when: benchmark_application.application_choice == "hotel-reservation"
 
-- name: run wrk2 load generator for the hotel reservation application
-  become: true
-  shell: ./hotel-reservation/hotelReservation/wrk2 -D exp -t 20 -c 20 -d 5m -L -s ./wrk2/scripts/hotel-reservation/mixed-workload_type_1.lua http://frontend.hotel-res.svc.cluster.local:5000 -R 100
-  environment:
-    KUBECONFIG: ./.kube/config
-  when: benchmark_application.application_choice == "hotel-reservation"
+# - name: run wrk2 load generator for the hotel reservation application
+#   become: true
+#   shell: ./hotel-reservation/hotelReservation/wrk2 -D exp -t 20 -c 20 -d 5m -L -s ./wrk2/scripts/hotel-reservation/mixed-workload_type_1.lua http://frontend.hotel-res.svc.cluster.local:5000 -R 100
+#   environment:
+#     KUBECONFIG: ./.kube/config
+#   when: benchmark_application.application_choice == "hotel-reservation"
