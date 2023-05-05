@@ -98,18 +98,14 @@
 #   retries: 6
 #   delay: 300
 
-- name: set hostnames to the created instances
-  become: true
-  shell: |
-    hostnamectl set-hostname {{inventory_hostname}}
-  loop: "{{ lookup('file', './cc/temp.txt').splitlines() }}"
-  when: "'ubuntu' in ansible_hostname"
+# - name: set hostnames to the created instances
+#   become: true
+#   shell: |
+#     hostnamectl set-hostname {{inventory_hostname}}
+#   loop: "{{ lookup('file', './cc/temp.txt').splitlines() }}"
+#   when: "'ubuntu' in ansible_hostname"
 
 - meta: refresh_inventory
-
-- name: Pause for 10 seconds to changes to take effect
-  ansible.builtin.pause:
-    seconds: 10
 
 ## TODO: delete the intermediate files folder once the cluster is setup
 # tagging instances to filter later

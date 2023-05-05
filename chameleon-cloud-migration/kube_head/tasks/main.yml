@@ -1,6 +1,16 @@
 ---
 # tasks file for kube_head
 
+- name: set hostnames to the created instances
+  become: true
+  shell: |
+    hostnamectl set-hostname {{inventory_hostname}}
+  when: "'ubuntu' in ansible_hostname"
+
+- name: Pause for 10 seconds to changes to take effect
+  ansible.builtin.pause:
+    seconds: 10
+
 - name: create Docker config directory
   file: path=/etc/docker state=directory
 
