@@ -1,18 +1,18 @@
-# - hosts: localhost
-#   roles:
-#   - local
+- hosts: localhost
+  roles:
+  - local
 
-# - hosts: head
-#   roles:
-#   - kube_head
+- hosts: head
+  roles:
+  - kube_head
 
-# - hosts: worker
-#   roles:
-#   - kube_worker
+- hosts: worker
+  roles:
+  - kube_worker
 
-# - hosts: head
-#   roles:
-#   - benchmark_application_deployer
+- hosts: head
+  roles:
+  - benchmark_application_deployer
 
 - hosts: head
   roles:

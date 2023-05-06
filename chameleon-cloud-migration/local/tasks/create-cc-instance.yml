@@ -88,24 +88,14 @@
   loop: "{{ lookup('file', './cc/temp.txt').splitlines() }}"
   when: item|split(' ')|first|regex_search("^(?!.*-1$).*")
 
-# - name: soft reboot all nodes
-#   become: true
-#   shell: |
-#     openstack --os-cloud=openstack server reboot {{item}}
-#   loop: "{{ lookup('file', './cc/cc-instance-names.txt').splitlines() }}"
-#   register: reboot_result
-#   until: reboot_result is success
-#   retries: 6
-#   delay: 300
-
-# - name: set hostnames to the created instances
-#   become: true
-#   shell: |
-#     hostnamectl set-hostname {{inventory_hostname}}
-#   loop: "{{ lookup('file', './cc/temp.txt').splitlines() }}"
-#   when: "'ubuntu' in ansible_hostname"
 
 - meta: refresh_inventory
+
+- name: Wait 30 minutes for successful instance creation, but only start checking after 20 minutes
+  ansible.builtin.wait_for_connection:
+    delay: 1200
+    sleep: 120
+    timeout: 1800
 
 ## TODO: delete the intermediate files folder once the cluster is setup
 # tagging instances to filter later
