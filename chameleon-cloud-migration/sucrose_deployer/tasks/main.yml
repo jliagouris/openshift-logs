@@ -1,9 +1,40 @@
 ---
 # tasks file for sucrose_deployer
 
-# deploy Prometheus to monitor our k8s cluster
+# deploy Prometheus to monitor our k8s cluster. Our Prometheus deployment is not instrumented for any specific application deployed on the cluster. It collects the available metrics already exposed by k8s.
 
-- name: deploy Prometheus to monitor our k8s cluster
-  become: true
-  shell: ls
+# - name: install helm package manager for k8s
+#   become: true
+#   shell: |
+#     curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+#     sudo apt-get install apt-transport-https --yes
+#     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+#     sudo apt-get update
+#     sudo apt-get install helm
+
+# # - name: install helm package manager for k8s
+# #   become: true
+# #   shell: sudo snap install helm --classic
+
+# - name: deploy Prometheus stack to monitor our k8s cluster
+#   become: true
+#   shell: |
+#     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+#     helm repo update
+#     helm install prometheus prometheus-community/kube-prometheus-stack --kubeconfig ~/.kube/config
+
+# - name: pause for 30 seconds for the Prometheus deployment to complete
+#   ansible.builtin.pause:
+#     seconds: 30
+
+# - name: confirm Prometheus endpoint is reachable and it returns a status 200
+#   become: true
+#   shell: curl -s -w "%{http_code}\n" "$(kubectl get services | grep kube-prometheus-prometheus | awk -v 'FS= ' '{print $3 ":9090"}')"
+#   register: result
+#   environment:
+#     KUBECONFIG: ./.kube/config
+
+
+
+
 
